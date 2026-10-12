@@ -1,0 +1,25 @@
+FILE PERMISSIONS
+
+Permission	Symbol	For a file					For a directory
+Read		r		View 						file contents	List directory entries
+Write		w		Modify 						file contents	Create, delete, or rename entries, subject to other restrictions
+Execute		x		Run a program or script		Enter/traverse the directory
+
+
+drwxrwxrwx & -rwxrwxrwx & lrwxrwxrwx
+
+first letter --> Directory/file/links
+next 3 letters --> Owner/User
+next 3 letters --> groups
+last 3 letters --> others
+
+chmod --> CHANGE MODE --> It changes permission of directory or file 
+Read --> 4
+Write --> 2
+Execute --> 1
+
+Symbolic Permissions
+chmod u+x app.sh
+chmod g+r application.conf
+
+chown --> CHANGE OWNER --> It changes the owner of a file or directory and can also change its group.

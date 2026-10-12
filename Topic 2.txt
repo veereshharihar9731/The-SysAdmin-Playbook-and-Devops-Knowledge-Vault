@@ -1,0 +1,12 @@
+USERS AND GROUPS
+
+User: An individual employee with their own login account.
+Group: A team of employees who need similar access to files or applications.
+Permissions: Rules that determine what each user or group can do.
+
+File			Purpose
+/etc/passwd		User account information
+/etc/shadow		Password hashes and password-aging information; restricted access
+/etc/group		Group information and supplementary memberships
+/etc/gshadow	Protected group administration information
+

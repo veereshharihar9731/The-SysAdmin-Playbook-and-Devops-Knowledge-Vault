@@ -1,0 +1,59 @@
+LINUX FILESYSTEM
+
+Directory	Purpose	
+
+/	    	Root of the entire filesystem	
+/home		Regular users' home directories	
+/root		Home directory of the root administrator
+/etc		System and application configuration
+/var		Frequently changing data
+/tmp		Temporary files
+/usr		Many user commands, libraries and programs
+/bin		Essential user commands
+/sbin		System administration commands
+/boot		Files required to boot Linux
+/dev		Device files representing hardware or virtual devices
+/proc		Virtual filesystem exposing process and kernel information
+/sys		Virtual filesystem exposing devices and kernel information
+/run		Runtime information since boot
+/opt		Optional or separately installed software
+/mnt		Common temporary mount point for filesystems
+/media		Common mount point for removable media
+
+
+
+1. What is a Linux filesystem? 
+A Linux filesystem organizes and manages files and directories on storage. It provides a structure for storing, locating, accessing and managing data.
+
+2. What is the root directory? 
+The root directory, represented by `/`, is the top-level directory of the Linux filesystem hierarchy. All normal filesystem paths start from it.
+
+3. What is the difference between `/root` and `/`? 
+`/` is the top-level filesystem directory, whereas `/root` is the home directory of the root administrator.
+
+4. Where are Linux logs stored? 
+Many traditional Linux log files are stored under `/var/log`. On systemd-based systems, logs may also be stored in the systemd journal and inspected using `journalctl`.
+
+5. How do you check disk space? 
+I use `df -h` to check used and available filesystem space and `df -i` to check inode usage.
+
+6. How do you find which directory consumes the most space? 
+I use `du -xhd1 /path` to inspect the immediate subdirectories of a path without crossing filesystem boundaries, where supported. I investigate the largest results further.
+
+7. What is the difference between `df` and `du`? 
+`df` reports filesystem-level usage and availability, whereas `du` estimates the storage used by files and directories.
+
+8. What is mounting in Linux?  
+Mounting attaches a filesystem to a directory called a mount point so that its contents can be accessed through the Linux directory hierarchy.
+
+9. What is an inode?  
+An inode stores file metadata and references to the file's data. A directory entry maps a filename to an inode.
+
+10. What would you do if `/var` becomes full? 
+I would identify the affected filesystem, check space and inode usage, investigate large logs and other consumers, review retention policies, perform approved cleanup, and verify recovery.
+
+11. What are `/proc` and `/sys`?  
+They are virtual filesystems exposing information about processes, the kernel, devices, and system state. Their contents are not ordinary persistent files stored like application documents.
+
+12. What happens if a filesystem becomes read-only?  
+Writes can fail while reads may continue. I would check mount status and system logs for filesystem or storage errors, investigate the cause, and follow the approved recovery procedure rather than blindly remounting it read-write.

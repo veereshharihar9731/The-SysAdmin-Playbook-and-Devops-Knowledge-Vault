@@ -1,0 +1,37 @@
+MANAGING SERVICES & TROUBLESHOOTING 
+
+1. systemctl — manages services and other systemd units.
+
+2. journalctl — reads logs collected by the systemd journal.
+
+SYSTEMCTL
+
+Task							Command
+Check service status			systemctl status nginx
+Start a service					sudo systemctl start nginx
+Stop a service					sudo systemctl stop nginx
+Restart a service				sudo systemctl restart nginx
+Reload service configuration	sudo systemctl reload nginx
+Enable service at boot			sudo systemctl enable nginx
+Disable automatic startup		sudo systemctl disable nginx
+Check whether it starts at boot	systemctl is-enabled nginx
+Check whether it is running		systemctl is-active nginx
+List failed units				systemctl --failed
+
+1. start --> starts the service now.
+2. enable --> configures it to start automatically at boot.
+3. restart --> stops and starts the service again.
+4. reload --> asks a service to reload its configuration without a full restart, if supported.
+
+JOURNALCTL
+
+Task									Command
+View journal logs						journalctl
+View recent logs						journalctl -n 50
+Follow logs live						journalctl -f
+View logs for Nginx						journalctl -u nginx
+View service logs from this boot		journalctl -u nginx -b
+Show recent service logs				journalctl -u nginx -n 100
+Show errors and more severe messages	journalctl -p err
+Show logs since a time					journalctl --since "1 hour ago"
+Show logs within a time range			journalctl --since "2026-10-12 09:00:00" --until "2026-10-12 10:00:00"

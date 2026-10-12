@@ -1,0 +1,33 @@
+FILE ARCHIVING & COMPRESSING 
+
+1. tar --> bundles files and directories into a single archive. By itself, it does not compress the data.
+
+2. zip --> bundles files and compresses them into a .zip archive.
+
+Feature				tar									zip
+Main purpose		Archive files and directories		Archive and compress files
+Common extension	.tar								.zip
+Compression			Optional							Normally compressed
+Compressed formats	.tar.gz, .tar.bz2, .tar.xz			.zip
+Common use			Linux backups and deployments		Cross-platform file sharing
+
+CMD --> Create an archive
+tar -cvf myapp.tar myapp/
+
+c --> Create an Archive
+v --> Shows files being processed
+f --> specify the archive filename
+
+CMD --> Extract an archive
+tar -xvf myapp.tar
+
+x --> Extract an Archive
+v --> Shows files being processed
+f --> specify the archive filename
+
+
+zip -r myapp.zip myapp/
+
+r --> means includes all sub-directories
+
+unzip myapp.zip

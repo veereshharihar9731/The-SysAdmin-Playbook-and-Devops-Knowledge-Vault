@@ -1,0 +1,52 @@
+CRONJOBS & SSH
+
+1. Cron jobs: Automate commands and scripts to run at scheduled times.
+
+2. SSH (Secure Shell): Securely connect to and administer remote Linux servers.
+
+Command					Purpose
+crontab -l				List your scheduled jobs
+crontab -e				Edit your scheduled jobs
+crontab -r				Remove all your user's cron jobs
+systemctl status cron	Check cron service on Ubuntu
+systemctl status crond	Check cron service on many RHEL-based systems
+journalctl -u cron		Inspect cron service logs on systems using this unit
+journalctl -u crond		Inspect crond service logs on systems using this unit
+
+
+* * * * *
+
+First is minutes
+next is hour
+next is day of month
+next is month
+next is weekday
+
+
+Symbol	Meaning
+*		Every allowed value
+,		Specific values, e.g. 1,3,5
+-		Range, e.g. 1-5
+*/n		Every n units, e.g. */15
+
+Schedule								Cron expression
+Every minute							* * * * *
+Every 5 minutes							*/5 * * * *
+Every 15 minutes						*/15 * * * *
+Every hour								0 * * * *
+Every day at 2:00 AM					0 2 * * *
+Every Sunday at 3:30 AM					30 3 * * 0
+First day of every month at midnight	0 0 1 * *
+Weekdays at 8:30 AM						30 8 * * 1-5
+
+
+Command											Purpose
+ssh username@server_ip							Connect to a remote server
+ssh -p 2222 username@server_ip					Connect using a custom port
+ssh -i ~/.ssh/id_ed25519 username@server_ip		Authenticate using a specified private key
+exit											End the remote session
+whoami											Check the current username
+hostname										Identify the current machine
+ip addr											View local network interfaces and addresses
+systemctl status ssh							Check the SSH service on Ubuntu
+systemctl status sshd							Check the SSH daemon on many RHEL-based systems

@@ -1,0 +1,10 @@
+LINUX TEXT PROCESSING AND FILE SEARCHING
+
+1. grep --> Search for TEXT (Finds specific words or patterns inside files and command output.)
+
+2. awk --> Process Structured TEXT (Reads text line by line and works with fields or columns.)
+
+3. sed --> Edit or Transform TEXT (Searches and transforms text, often without opening a file in a text editor.)
+
+4. find --> Searchfor Files & Directories (Locates files by name, type, modification time, size, and other criteria.)
+
