@@ -1,0 +1,90 @@
+SUBNET MASK & CIDR NOTATION
+
+A subnet mask tells us which part of an IPv4 address represents the network and which part identifies a host within that network.
+
+IP address: 192.168.1.10/24
+192.168.1 --> Network portion && 10 --> Host portion(/24 tells us that first 24 bits are Network Portion and next 8 bits are Host Portion)
+
+The equivalent subnet mask is --> 255.255.255.0
+
+CIDR stands for Classless Inter-Domain Routing. CIDR notation writes an IP address followed by a slash and a number, such as /24.
+The number after / tells us how many bits are in network portion
+
+IP address: 192.168.1.10
+Subnet mask: 255.255.255.0
+CIDR prefix: /24
+The network details are:
+
+Network address:192.168.1.0
+
+First usable host:192.168.1.1
+
+Last usable host:192.168.1.254
+
+Broadcast address:192.168.1.255
+
+Usable host addresses:254
+
+DEFAULT GATEWAY
+A default gateway is the router or next-hop device a computer uses when it needs to send traffic to a destination for which it has no more specific route.
+
+What is routing?
+Routing is the process of deciding where network traffic should go next.
+
+1. What is a default gateway?
+It is the next-hop router used for destinations that do not match a more-specific route.
+
+2. What is a routing table?
+A set of routes that Linux consults to determine the outgoing interface and next hop for network traffic.
+
+3. What does `0.0.0.0/0` mean?
+It is the default IPv4 route prefix, matching every IPv4 destination.
+
+4. Which command displays the Linux routing table?
+`ip route`.
+
+5. How do you find the route to a remote server?
+Use `ip route get SERVER_IP`, replacing SERVER_IP with the destination address.
+
+6. Can a server communicate without a default gateway?
+Yes. It can communicate with directly connected hosts and with destinations covered by other configured routes.
+
+7. What would you check if a server is unreachable?
+Check IP configuration, routing, gateway reachability where relevant, firewalls, return routes, destination service status, and the required port.
+
+Command				Main purpose										Example
+ping				Check network reachability using ICMP				ping -c 4 8.8.8.8
+traceroute			Show the network hops toward a destination			traceroute example.com
+tracepath			Trace network path, often available without root	tracepath example.com
+curl				Test URLs, APIs, HTTP/HTTPS responses				curl -I https://example.com
+wget				Download files from a URL							wget https://example.com/file.zip
+ip addr				View IP addresses									ip addr
+ip route			View routing table and default gateway				ip route
+ss					Check listening ports and network connections		ss -lntp
+dig					Troubleshoot DNS resolution							dig example.com
+nslookup			Look up DNS records									nslookup example.com
+nc					Test whether a TCP port is reachable				nc -vz server.example.com 8080
+mtr					Repeatedly examine network hops and packet loss		mtr example.com
+arp / ip neigh		View local network neighbor mappings				ip neigh
+tcpdump				Capture and inspect network packets					sudo tcpdump -i any port 8080
+
+DNS
+DNS stands for Domain Name System. It translates human-readable hostnames into IP addresses that computers use to communicate.
+
+File					Purpose
+/etc/hosts				Local hostname-to-address entries
+/etc/resolv.conf		DNS resolver configuration, often managed by the OS
+/etc/nsswitch.conf		Controls the order of name-resolution sources for system lookups
+
+Record				Purpose																	Example use
+A					Maps a hostname to an IPv4 address										app.example.com → IPv4
+AAAA				Maps a hostname to an IPv6 address										app.example.com → IPv6
+CNAME				Alias pointing to another hostname										www.example.com → another hostname
+MX					Specifies mail servers for a domain										Email delivery
+NS					Identifies authoritative DNS servers									Domain DNS management
+TXT					Stores text data, often used for verification and email security		SPF, domain verification
+PTR					Reverse lookup from an IP address to a hostname							Reverse DNS
+SRV					Specifies a service's target host and port 								Some directory and communication services
+
+
+dig --> Domain Information Groper. It queries DNS servers and displays DNS answers and diagnostic information.
