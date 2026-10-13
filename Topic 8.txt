@@ -1,0 +1,52 @@
+IP ADDRESS
+
+This is the numeric value used to identify network interface and help to deliver the data across network 
+
+IPV4 --> Address made of 4 decimal seperated dots
+Example: 192.168.0.0
+Each number ranges from 0-255
+
+IPV6 --> A newer address format designed to provide a much larger address space.
+Example: 2001:db8::20
+It uses hexadecimal groups separated by colons.
+
+Private IPv4 address ranges:
+10.0.0.0 – 10.255.255.255
+172.16.0.0 – 172.31.255.255
+192.168.0.0 – 192.168.255.255
+
+
+Command						What it does
+ip addr						Displays network interfaces and IP addresses
+ip -br addr					Displays interfaces in a short, readable format
+hostname -I					Shows assigned IP addresses
+ip route					Displays the routing table and default gateway
+ip link						Shows network interfaces and their link state
+ping -c 4 192.168.1.20		Tests connectivity by sending four ICMP requests
+ip neigh					Shows the local neighbor table, commonly IPv4 ARP entries and IPv6 neighbor entries
+
+Static IP
+An address configured to remain consistent unless someone changes the configuration.
+Example: A server hosting a business application may use a fixed address so other systems can reach it reliably.
+
+Dynamic IP
+An address assigned automatically, commonly through DHCP, and potentially changed when the lease is renewed or the network changes.
+Example: A laptop receives its network configuration automatically when joining Wi-Fi.
+
+1. What is an IP address?
+A numerical network address used to identify an interface and route data to the appropriate destination.
+
+2. What is the difference between IPv4 and IPv6?
+IPv4 uses 32-bit addresses; IPv6 uses 128-bit addresses and supports a vastly larger address space.
+
+3. What is the difference between a private and public IP?
+Private IPs are intended for private networks; public IPs are used for addressing across the public internet.
+
+4. What does 127.0.0.1 mean?
+It is the IPv4 loopback address, which refers to the local host.
+
+5. Which Linux command displays the IP address?
+Use `ip addr` or the concise `ip -br addr` command.
+
+6. What is a default gateway?
+A router or routing next hop used to forward traffic when no more specific route matches the destination.
