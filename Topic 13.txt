@@ -1,0 +1,15 @@
+Reverse proxy
+A reverse proxy is a server that receives requests from clients and forwards them to one or more backend servers on the clients' behalf.
+
+Load balancer
+A load balancer distributes incoming traffic across multiple backend servers according to a configured policy.
+* Round Robin -->Requests are assigned to servers in rotation.
+* Weighted Routing --> Servers with higher configured weights receive a larger share of traffic.
+* Least Connection --> New connections are directed toward the server with fewer active connections, according to the implementation's rules.
+* Health Based Routing --> Servers that fail configured health checks can be removed from normal traffic until they recover.
+
+Reverse proxy													Load balancer
+Receives requests and forwards them to backends					Distributes traffic across backends
+Can route based on host, path, or application rules				Selects a backend based on an algorithm and health status
+Can provide TLS termination, access controls, and logging		Can improve capacity and availability by distributing traffic
+Can operate with one backend									Usually provides most benefit with multiple backends
