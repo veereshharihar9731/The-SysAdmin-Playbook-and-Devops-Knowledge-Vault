@@ -1,0 +1,69 @@
+HTTP & HTTPS
+
+HTTP stands for Hypertext Transfer Protocol. It is a protocol that allows a client, such as a browser or application, to send requests to a web server and receive responses.
+HTTPS is HTTP protected by TLS (Transport Layer Security). TLS encrypts data in transit and helps the client verify the server's identity using its certificate.
+
+HTTP --> 80 port
+HTTPS --> 443 port
+
+Method			Typical purpose										Example
+GET				Retrieve data										Open a webpage
+POST			Submit data or create a resource					Login request or create a record
+PUT				Create or replace a resource at a known URL			Replace a configuration resource
+PATCH			Partially update a resource							Change a user's email
+DELETE			Delete a resource									Delete a test record
+HEAD			Request headers without the response body			Check response headers
+
+2xx
+Success
+- 200 OK — request succeeded.
+- 201 Created — a resource was created.
+- 204 No Content — success with no response body.
+
+3xx
+Redirection
+- 301 Moved Permanently — permanent redirect.
+- 302 Found — temporary redirect.
+- 304 Not Modified — cached representation can be reused.
+
+4xx
+Client/request-side issues
+- 400 Bad Request — request is invalid.
+- 401 Unauthorized — authentication is missing or invalid.
+- 403 Forbidden — request is not allowed.
+- 404 Not Found — requested resource was not found.
+- 429 Too Many Requests — rate limit exceeded.
+
+5xx
+Server-side or gateway issues
+- 500 Internal Server Error — unexpected server-side error.
+- 502 Bad Gateway — gateway received an invalid response from an upstream.
+- 503 Service Unavailable — service temporarily unable to handle the request.
+- 504 Gateway Timeout — gateway did not receive an upstream response in time.
+
+TLS --> Transport Layer Security
+A TLS certificate helps a client verify that it is communicating with the intended server. It includes the server identity and public-key information and is digitally signed.
+
+1. What is the difference between HTTP and HTTPS?
+HTTPS is HTTP protected by TLS, providing encryption and certificate-based server authentication.
+
+2. What are the default ports for HTTP and HTTPS?
+HTTP uses port 80 and HTTPS uses port 443 by default.
+
+3. What does HTTP 404 mean?
+The requested resource was not found; the server itself may still be healthy.
+
+4. What is the difference between 502 and 504?
+502 indicates an invalid upstream response; 504 indicates an upstream response timeout.
+
+5. Why is a TLS certificate required?
+It helps the client verify server identity and establish a secure TLS connection.
+
+6. How do you check an HTTPS response from Linux?
+Use curl -v https://hostname to inspect the connection, TLS, and HTTP response.
+
+7. What does curl -I do?
+It requests response headers without the normal response body, using an HTTP HEAD request.
+
+8. What is TLS termination?
+A proxy or load balancer handles the client's TLS connection and may forward traffic to an upstream service.
