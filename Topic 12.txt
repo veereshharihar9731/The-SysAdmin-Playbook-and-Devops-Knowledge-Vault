@@ -1,0 +1,17 @@
+NAT --> Network Address Translation
+It is a function performed by a router, firewall, or gateway that changes IP addresses in network packets and, in many cases, their port numbers.
+
+Routing	 --> 	Chooses where packets should go
+NAT 	 -->	Translates IP addresses and sometimes ports
+Firewall -->	Allows or blocks traffic according to rules
+
+10.0.0.0/8		--> Large corporate and cloud networks
+172.16.0.0/12	--> Corporate and application networks
+192.168.0.0/16	--> Home, lab, and small office networks
+
+
+NAT: Rewrites packet addresses and possibly ports.
+
+Reverse proxy: Accepts application-layer requests and forwards them to backend services; it can terminate TLS and add HTTP headers.
+
+Load balancer: Distributes traffic across backend servers using configured algorithms and health checks.
