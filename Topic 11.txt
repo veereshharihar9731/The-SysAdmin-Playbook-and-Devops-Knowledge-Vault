@@ -1,0 +1,54 @@
+What are TCP and UDP?
+TCP and UDP are transport-layer protocols. They carry data between applications running on different machines.
+
+TCP: Establishes a connection and provides reliable, ordered delivery of a byte stream.
+
+UDP: Sends individual datagrams without establishing a connection first or guaranteeing delivery and order.
+
+TCP
+Connection-oriented
+- Acknowledgments
+- Retransmissions
+- Ordered byte stream
+- Flow and congestion control
+Examples: HTTPS, SSH, most database connections
+
+UDP
+Datagram-oriented
+- No connection handshake
+- No built-in delivery guarantee
+- No built-in ordering guarantee
+- Low protocol overhead
+Examples: DNS queries, many real-time voice/video applications
+
+Feature							TCP																			UDP
+Connection setup				Yes																			No
+Delivery guarantee				Reliable delivery is provided while the connection operates normally		No delivery guarantee
+Packet ordering					Presents an ordered byte stream												Datagrams can arrive out of order
+Retransmissions					Built in																	Not built in
+Flow control					Yes																			No built-in flow control
+Congestion control				Yes																			No built-in congestion control
+Data format						Byte stream																	Individual datagrams
+Header size						Minimum 20 bytes															8 bytes
+Typical uses					HTTPS, SSH, databases, application connections								DNS, voice/video, gaming, selected streaming protocols
+
+
+CLIENT										SERVER
+
+1. SYN(Client requests a connection.) -----> Server receives SYN
+
+Client receives reply  <-----  2. SYN-ACK(Server acknowledges and responds.)
+
+3. ACK(Client acknowledges the server.) -------> Connection established
+
+SYN: The client asks to establish a TCP connection and provides an initial sequence number.
+SYN-ACK: The server acknowledges the client's request and sends its own synchronization request.
+ACK: The client acknowledges the server's response. The connection can now carry application data.
+
+
+Protocol 					Port
+SSH							22
+DNS							53
+HTTP						80
+HTTPS						443
+MYSQL 						3306
