@@ -1,0 +1,16 @@
+SSL Certificates
+
+SSL and TLS?
+SSL (Secure Sockets Layer): An older protocol that is obsolete and insecure.
+TLS (Transport Layer Security): The modern protocol used to secure HTTPS connections.
+HTTPS: HTTP communication protected by TLS.
+
+SSL/TLS certificate?
+A TLS certificate is a digitally signed document that binds an identity, such as a hostname, to a public key.
+
+Certificate contains:
+- Subject Alternative Name (SAN): Hostnames or IP addresses for which the certificate is valid.
+- Issuer: The certificate authority (CA) that signed the certificate.
+- Validity period: The date range during which the certificate is valid.
+- Public key: Used as part of the cryptographic process.
+- Signature: Allows verification that the certificate was signed by the issuer.
