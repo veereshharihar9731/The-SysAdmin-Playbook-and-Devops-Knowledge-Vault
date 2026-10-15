@@ -1,0 +1,22 @@
+Firewall
+A firewall is a security control that decides which network traffic is allowed or blocked according to configured rules.
+
+Ports
+A port identifies a network service on a computer. TCP and UDP have separate port-number spaces, numbered from 0 to 65535.
+
+22		SSH	
+53		DNS	
+80		HTTP
+443		HTTPS
+3306	MySQL
+5432	PostgreSQL
+8080	Common Tomcat/HTTP
+8443	Common HTTPS
+
+Firewall Tools
+1. UFW --> uncomplicated Firewall
+2. firewalld --> Firewall service
+
+ufw status verbose					firewall-cmd --state
+sudo ss -lntp | grep ':8080'		sudo ss -lntp | grep ':8080'
+sudo ss -lnup | grep ':8080'		sudo ss -lnup | grep ':8080'
