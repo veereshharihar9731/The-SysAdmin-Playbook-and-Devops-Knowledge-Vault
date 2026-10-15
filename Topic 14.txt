@@ -14,3 +14,17 @@ Certificate contains:
 - Validity period: The date range during which the certificate is valid.
 - Public key: Used as part of the cryptographic process.
 - Signature: Allows verification that the certificate was signed by the issuer.
+
+1. SSL/TLS Certificate
+The server's digital ID card. It contains the server's identity, public key, validity dates, issuer information, and a digital signature.
+2. Public key and Private key
+Think of a public key as something you can share, and a private key as a secret that must be protected.
+The certificate contains the public key. The corresponding private key is kept securely on the server or in an approved key-management system.
+3. CA — Certificate Authority
+The organization that issues or signs a certificate, after applying its validation process. Examples include DigiCert and Let's Encrypt.
+4. CSR — Certificate Signing Request
+A request sent to a CA asking it to issue a certificate. It contains the public key and requested identity information. The CSR is generated using a private key, which must not be sent to the CA.
+5. Certificate expiry
+Every certificate has a validity period. After its Not After date, it is expired and normally fails standard certificate validation.
+6. Certificate chain
+A chain links the server certificate to a trusted root certificate, usually through one or more intermediate certificates. Missing intermediates can cause trust errors.
