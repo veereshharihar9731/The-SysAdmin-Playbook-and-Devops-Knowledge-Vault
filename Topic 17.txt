@@ -1,0 +1,23 @@
+Bash Scripting : Conditions and Loops
+
+1. if/else — Make decisions -------> check_disk.sh
+An if/else statement lets a script choose what to do based on a condition.
+
+Operator	Meaning							Example
+-eq			Equal to						[ "$a" -eq "$b" ]
+-ne			Not equal to					[ "$a" -ne "$b" ]
+-gt			Greater than					[ "$a" -gt 80 ]
+-ge			Greater than or equal to		[ "$a" -ge 80 ]
+-lt			Less than						[ "$a" -lt 80 ]
+-le			Less than or equal to			[ "$a" -le 80 ]
+=			Strings equal					[ "$service" = "tomcat" ]
+!=			Strings differ					[ "$service" != "tomcat" ]
+
+2. elif — Check multiple conditions ------> disk_level.sh/file_check.sh
+Suppose you want to classify disk usage as normal, warning, or critical.
+
+3. for loop — Repeat a task -------> port_list.sh/service_list.sh
+A for loop runs commands for each item in a list.
+
+4. while loop — Repeat while a condition is true ------> countdown.sh/http_check.sh
+A while loop continues as long as its condition succeeds.
