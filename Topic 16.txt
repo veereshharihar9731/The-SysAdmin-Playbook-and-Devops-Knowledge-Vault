@@ -1,0 +1,31 @@
+service monitoring, log analysis, backup automation, and middleware health checks.
+
+
+Bash scripting?
+Shell: A program that accepts commands and runs them.
+Bash: A popular Linux shell (Bourne Again SHell).
+Shell script: A file containing multiple commands that run in sequence.
+
+
+shebang --> #!/bin/bash
+
+
+The shebang tells Linux which interpreter to use when executing the script directly. Here, it specifies Bash.
+# starts a comment in ordinary shell-script lines.
+! is part of the shebang syntax.
+/bin/bash is the Bash interpreter path on these systems.
+
+Variables
+Variables store values that your script can reuse. --> variables.sh/server_info.sh
+
+Arguments: pass values when running a script
+Arguments allow you to reuse one script for different servers, services, or files. --> greet.sh
+
+read: accept input from the user --> user_input.sh
+
+read waits for user input.
+-r prevents backslashes from being treated as escape characters.
+-p displays the prompt.
+
+Environment variables
+Environment variables provide values to processes, such as executable search paths, home directories, and runtime settings.
