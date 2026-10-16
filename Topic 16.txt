@@ -1,5 +1,4 @@
-service monitoring, log analysis, backup automation, and middleware health checks.
-
+Bash Scripting : Fundamentals
 
 Bash scripting?
 Shell: A program that accepts commands and runs them.
