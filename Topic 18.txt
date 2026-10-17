@@ -1,0 +1,20 @@
+Bash Functions, File Processing, Logging & Automation
+
+Bash functions ------> bash_functions.sh/service_function.sh
+A function is a named block of commands that you can execute whenever you need it.
+For example, instead of repeatedly writing commands to print the date and server name, create one function and reuse it.
+
+Read Files --------> read_file.sh
+we create a file and pass teh argument in scripts so that script can read lines from file one by one
+
+Created a mini project with functions
+
+Read service names from services.txt.
+Check each service using systemctl.
+Write timestamped results into monitor.log.
+Print the status on screen.
+Return exit code 1 if any service is not running.
+
+case statements -----> menu.sh
+A case statement is useful when a script needs to choose between several options, such as checking a service, checking disk space, or displaying help.
+
