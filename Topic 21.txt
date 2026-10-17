@@ -1,0 +1,105 @@
+Fetch, Reset, Revert, Stash, Pull Requests & .gitignore
+
+1. git fetch — Check for remote changes
+What it does: Downloads information about new remote commits and branches without merging them into your current branch.
+
+git fetch origin
+git status
+git log --oneline main..origin/main
+
+Command					What happens
+git fetch origin		Downloads remote updates; doesn't integrate them into your current branch
+git pull origin main	Fetches and integrates remote main into your current branch
+
+2. git reset — Move the current branch back
+git reset moves the current branch to another commit. Depending on the option, it can also unstage changes or discard working-directory changes.
+
+Command						Effect
+git reset --soft HEAD~1		Undo the latest commit but keep its changes staged
+git reset --mixed HEAD~1	Undo the latest commit and leave its changes unstaged
+git reset --hard HEAD~1		Undo the latest commit and discard associated tracked-file changes
+HEAD~1 means the commit immediately before your current commit.
+
+
+[root@localhost git-practice]# echo "Reset practice" >> README.md
+git add README.md
+git commit -m "Practice reset"
+[main e3553fc] Practice reset
+ 1 file changed, 1 insertion(+)
+ 
+ 
+[root@localhost git-practice]# git reset --soft HEAD~1
+git status
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   README.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        The-SysAdmin-Playbook-and-Devops-Knowledge-Vault/
+
+
+3. git revert — Safely undo a commit
+git revert creates a new commit that reverses the changes introduced by an earlier commit. It preserves the existing history, which makes it useful for shared branches.
+
+git revert a1b2c3d
+
+The original commit remains in history, and a new revert commit reverses its changes.
+
+reset moves a branch reference and may rewrite history.
+revert adds a new commit that undoes earlier changes.
+
+
+4. git stash — Temporarily save unfinished work
+Suppose you're editing a shell script but need to switch branches to investigate an urgent issue. You don't want to commit the unfinished changes yet.
+
+git stash push -m "WIP troubleshooting note"
+
+Check your working directory:
+git status
+git stash list
+
+Reapply your saved changes:
+git stash pop
+
+Check the file and status again:
+git diff
+git status
+
+
+Command							Purpose
+git stash push -m "message"		Save tracked working-tree changes with a description
+git stash list					List saved stashes
+git stash apply					Reapply a stash while keeping it saved
+git stash pop					Reapply a stash and remove it if successfully applied
+git stash drop					Delete a stash entry
+
+5. Pull requests (PRs) — Propose changes for review
+A pull request is a GitHub collaboration feature. It lets teammates review your changes before they are merged into a shared branch.
+
+Create a feature branch
+feature/disk-alert
+
+Edit, test and commit
+Keep changes focused
+
+Push your branch
+git push -u origin feature/disk-alert
+
+Open a pull request
+Compare feature branch → main on GitHub
+
+Review, approve and merge
+Follow the team's review and release process
+
+6. .gitignore — Keep unwanted files out of Git
+A .gitignore file tells Git which files and directories it should ignore when they're untracked. It's especially useful for middleware scripts, Python projects, logs, temporary files, and local configuration.
+
+Topic			Main command								Remember
+Fetch			git fetch origin							Download remote updates without integrating them
+Reset			git reset --soft HEAD~1						Undo the last commit while keeping changes staged
+Revert			git revert COMMIT_ID						Undo a commit with a new commit
+Stash			git stash push -m "WIP"						Temporarily save unfinished changes
+Pull request	Push a branch, then create a PR on GitHub	Review changes before merging
+Git ignore		Edit .gitignore								Ignore matching untracked files
