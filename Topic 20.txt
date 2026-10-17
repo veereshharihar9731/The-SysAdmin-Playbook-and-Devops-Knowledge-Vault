@@ -1,0 +1,114 @@
+Clone, Pull, Branches, Merge & Merge Conflicts
+
+1. git clone — Copy a repository
+Use this when you need to download an existing project from GitHub for the first time.
+
+git clone https://github.com/YOUR-USERNAME/git-practice.git
+git status
+git remote -v
+git branch
+
+
+git clone — initial copy of a remote repository.
+git pull — update an existing local branch with remote changes.
+
+
+2. git pull — Get the latest changes
+Imagine another engineer updates README.md on GitHub. You want those changes on your local computer.
+
+git switch main
+git pull origin main
+git log --oneline -5
+git status
+
+3. Branches — Work without affecting main
+A branch lets you work on a change independently before merging it into the main branch.
+
+git switch main
+git pull origin main
+git switch -c feature/health-check
+
+git branch
+
+4. Merge — Combine your branch into main
+Once your feature is ready, merge it into the main branch.
+
+git switch main
+git merge feature/health-check
+
+git switch feature/health-check
+git push -u origin feature/health-check
+
+5. Merge conflicts
+A merge conflict occurs when Git cannot automatically combine changes, often because two branches modified the same lines in the same file.
+
+[root@localhost git-practice]# git switch main
+echo "HTTP_PORT=8080" > conflict-demo.txt
+git add conflict-demo.txt
+git commit -m "Add base HTTP port configuration"
+Already on 'main'
+[main e80b8cd] Add base HTTP port configuration
+ 1 file changed, 1 insertion(+)
+ create mode 100644 conflict-demo.txt
+ 
+[root@localhost git-practice]# git switch -c feature/change-port
+echo "HTTP_PORT=8081" > conflict-demo.txt
+git add conflict-demo.txt
+git commit -m "Change HTTP port to 8081"
+Switched to a new branch 'feature/change-port'
+[feature/change-port 0dc201f] Change HTTP port to 8081
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ 
+[root@localhost git-practice]# git switch main
+echo "HTTP_PORT=9090" > conflict-demo.txt
+git add conflict-demo.txt
+git commit -m "Change HTTP port to 9090"
+Switched to branch 'main'
+[main fce3ba9] Change HTTP port to 9090
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ 
+ 
+[root@localhost git-practice]# git merge feature/change-port
+Auto-merging conflict-demo.txt
+CONFLICT (content): Merge conflict in conflict-demo.txt
+Automatic merge failed; fix conflicts and then commit the result.
+
+6. Resolve the conflict
+In main branch chnage the conflict then it can be solved 
+
+[root@localhost git-practice]# cat conflict-demo.txt
+<<<<<<< HEAD
+HTTP_PORT=9090
+=======
+HTTP_PORT=8081
+>>>>>>> feature/change-port
+
+[root@localhost git-practice]# echo "HTTP_PORT=8081" > conflict-demo.txt
+
+[root@localhost git-practice]# cat conflict-demo.txt
+git add conflict-demo.txt
+git commit -m "Resolve HTTP port merge conflict"
+HTTP_PORT=8081
+[main decbe65] Resolve HTTP port merge conflict
+
+[root@localhost git-practice]# git status
+On branch main
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        The-SysAdmin-Playbook-and-Devops-Knowledge-Vault/
+
+nothing added to commit but untracked files present (use "git add" to track)
+[root@localhost git-practice]#
+
+Command								Purpose
+git clone URL						Download a repository
+git pull origin main				Update local main from remote main
+git branch							List local branches
+git switch -c feature/name			Create and switch to a branch
+git switch main						Switch to main
+git merge feature/name				Merge a branch into the current branch
+git status							Check changes and conflicts
+git add filename					Stage a change or conflict resolution
+git commit							Save the staged changes
+git log --oneline --graph --all		Visualize commit history
+git merge --abort					Cancel an in-progress merge when appropriate
