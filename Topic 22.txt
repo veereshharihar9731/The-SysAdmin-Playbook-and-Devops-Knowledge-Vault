@@ -1,0 +1,108 @@
+Tags, Reflog & Meaningful Commit Messages
+
+1. Git tags — Mark a specific version
+A Git tag gives a name to a particular commit. Think of it as putting a version label on a tested, stable release of your project.
+
+git reflog — Recover from Git mistakes
+git reflog records where your local Git references, such as HEAD, have pointed recently. It is especially helpful if you accidentally reset a branch, switch branches, or lose track of a commit.
+
+Important points:
+- Reflog is local to your repository; it is not a replacement for a remote backup.
+- Recovery is not guaranteed forever. Reflog entries and unreachable commits can eventually expire or be cleaned up.
+- git reflog doesn't undo mistakes automatically; it helps you find the commit or branch position you need.
+- Avoid running another reset --hard while trying to recover until you've identified the correct commit.
+
+3. Writing meaningful commit messages
+A commit message explains what changed and why. Good messages make it easier for teammates, reviewers, and support engineers to understand project history during troubleshooting.
+
+
+To check git version
+git --version
+
+Configure your Username an Email
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+
+To display the config users
+git config --list
+
+To connect to your local repo to git
+git remote add origin https://github.com/your-username/middleware-lab.git
+
+Verify your connection with git 
+git remote -v
+
+create local repo 
+git init
+
+copy the remote repo from git to local 
+git clone <URL>
+
+check file changes 
+git status
+
+Stage a file to repo 
+git add <file>
+
+to stage all files in current folder 
+git add .
+
+Create a feature branch
+git switch -c feature/service-monitoring
+
+Push the branch to GitHub
+git push -u origin feature/service-monitoring
+
+Upload commits to remote
+git push
+
+Fetch and integrate remote changes
+git pull
+
+Download remote updates without integrating them
+git fetch
+
+git tags 
+git tag
+git tag v1.0
+git tag -a v1.0 -m "Version 1.0"
+git push origin v1.0
+git push origin --tags
+
+
+[root@localhost git-pratice]# git --version
+git version 2.52.0
+
+[root@localhost git-pratice]# git init
+Initialized empty Git repository in /work/git-pratice/.git/
+
+[root@localhost git-pratice]# git config --global user.name "veereshharihar9731"
+git config --global user.email "veereshharihar98@gmail.com"
+git config --global --list
+user.name=veereshharihar9731
+user.email=veereshharihar98@gmail.com
+init.defaultbranch=main
+
+[root@localhost git-pratice]# git remote add origin https://github.com/veereshharihar9731/git-practice.git
+[root@localhost git-pratice]# git remote -v
+origin  https://github.com/veereshharihar9731/git-practice.git (fetch)
+origin  https://github.com/veereshharihar9731/git-practice.git (push)
+
+[root@localhost git-pratice]# git switch -c feature/healthcheck
+
+echo '#!/bin/bash' > healthcheck.sh
+echo 'echo "RHEL health check started"' >> healthcheck.sh
+chmod +x healthcheck.sh
+
+./healthcheck.sh
+Switched to a new branch 'feature/healthcheck'
+RHEL health check started
+
+[root@localhost git-pratice]# git add .
+git commit -m "Add RHEL health check script"
+[feature/healthcheck (root-commit) 023fd88] Add RHEL health check script
+ 1 file changed, 2 insertions(+)
+ create mode 100755 healthcheck.sh
+
+#Upload your branch to GitHub
+git push -u origin feature/healthcheck
