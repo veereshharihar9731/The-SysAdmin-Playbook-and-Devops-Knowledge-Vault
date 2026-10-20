@@ -1,6 +1,15 @@
 LINKS
 
-ChatGPT : https://chatgpt.com/c/6acc6f40-03f8-83ee-b6a7-791b8eac4fc0
+ChatGPT 
+
+https://chatgpt.com/c/6acc6f40-03f8-83ee-b6a7-791b8eac4fc0
+
+https://chatgpt.com/c/6ad7acce-cb30-83e8-a341-6d1a03a0d963
+
+https://chatgpt.com/c/6ad7aef9-7c00-83ec-a73a-8b2e12dc7474
+
+
+
 
 AWS Console : https://865609249582-hp6n5ek3.ap-southeast-2.console.aws.amazon.com/console/home?region=ap-southeast-2
 
