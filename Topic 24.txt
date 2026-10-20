@@ -1,0 +1,192 @@
+EC2 stands for Elastic Compute Cloud. It is an AWS service that lets you create and manage virtual servers in the cloud.
+
+Component					What it means
+Instance					The virtual server
+AMI							A template used to launch a server, including an OS image
+Instance type				The server's CPU, memory, network, and other hardware capabilities
+Region						The AWS geographic area you select
+Availability Zone (AZ)		An isolated location within a Region
+VPC							Your logically isolated network in AWS
+Subnet						An IP address range within a VPC, associated with an AZ
+Security group				A stateful virtual firewall attached to network interfaces
+Key pair					Public/private keys used for supported SSH login methods
+EBS							Persistent block storage commonly used for an EC2 system disk
+IAM role					Permissions a server can use through temporary credentials
+CloudWatch					AWS service for metrics, alarms, and monitoring
+
+Cloud: AWS EC2
+Region: Asia Pacific (Sydney), ap-southeast-2
+OS: Amazon Linux 2023
+Login user: ec2-user
+Web server: Nginx
+Backend: Python HTTP server
+Nginx port: 80
+Backend port: 8080
+EC2 public IP used in the lab: IP
+
+
+Part 1 — Launch an EC2 instance
+Step 1. Open AWS EC2
+1. Sign in to the AWS Console.
+2. Open EC2 → Instances → Launch instances.
+3. Enter a name, such as Middleware-Lab.
+4. Select Amazon Linux 2023.
+5. Choose an instance type eligible under your account's current free-tier/credit terms.
+6. Create a key pair named aws-learning-key.
+7. Download and safely store the .pem private key.
+8. Select or create a VPC and subnet.
+9. Configure the security group.
+10. Review storage and estimated costs.
+11. Launch the instance.
+
+Step 2. Configure the security group
+For this lab, the inbound rules were:
+Type	Port	Source	Purpose
+SSH	22	My IP	Remote Linux administration
+HTTP	80	0.0.0.0/0	Test Nginx from a browser
+Port 80 is publicly accessible with that rule. Restrict it when public access is no longer required. Keep SSH restricted to your IP.
+Step 3. Connect to EC2
+On your local computer, open a terminal in the folder containing your key. For Windows, Git Bash or another SSH-capable terminal can be used.
+ssh -i "aws-learning-key.pem" ec2-user@YOUR_PUBLIC_IP
+
+
+Replace YOUR_PUBLIC_IP with the instance's current public IP.
+
+On the first connection, SSH may ask you to confirm the server's host key. Verify it where possible before accepting.
+
+After connecting, the prompt should look similar to:
+[ec2-user@ip-172-31-45-160 ~]$
+
+
+
+Part 2 — Basic EC2/Linux health checks
+Run these commands after connecting.
+Step 4. Identify the server
+whoami
+hostname
+cat /etc/os-release
+uptime
+nproc
+
+
+What they show:
+- whoami — current Linux user.
+- hostname — server hostname.
+- /etc/os-release — operating system details.
+- uptime — uptime and load averages.
+- nproc — number of available processing units.
+Step 5. Check disk and filesystems
+lsblk
+lsblk -f
+df -h
+df -Th /
+sudo du -xhd1 /var 2>/dev/null
+
+
+Meaning:
+- lsblk — disks and partitions.
+- lsblk -f — filesystem type, UUID and mount points.
+- df -h — disk usage in readable units.
+- df -Th / — root filesystem type and capacity.
+- du -xhd1 /var — approximate size of directories directly under /var, staying on the same filesystem.
+Our instance had an 8 GB root filesystem using XFS, with approximately 20% used at the time of checking.
+
+Step 6. Check memory and processes
+free -h
+ps -eo pid,ppid,user,%cpu,%mem,comm --sort=-%mem | head
+
+
+- free -h — memory and swap usage.
+- ps — process information.
+- PID — process ID.
+- PPID — parent process ID.
+- %CPU and %MEM — CPU and memory usage.
+
+Step 7. Check services and listening ports
+systemctl --failed
+systemctl is-active sshd
+systemctl status amazon-ssm-agent --no-pager
+sudo ss -lntp
+
+
+What we observed:
+- SSH was active.
+- No failed systemd units were reported.
+- SSM Agent was running, but its startup logs contained HTTP 400/404 responses. Its connectivity still needs separate verification.
+- Before installing Nginx, SSH was listening on port 22.
+Interview note: A service being active does not always mean the application is fully functional. Verify logs, connectivity, permissions and the actual application response too.
+
+Part 3 — Install and start Nginx
+Step 8. Install Nginx
+Amazon Linux 2023 uses dnf for package management.
+sudo dnf install nginx -y
+
+
+Check the version:
+nginx -v
+
+
+Our installation returned Nginx version 1.30.5.
+Step 9. Start Nginx and enable it at boot
+sudo systemctl enable --now nginx
+
+
+Verify:
+systemctl is-active nginx
+systemctl is-enabled nginx
+sudo systemctl status nginx --no-pager
+
+
+Expected:
+active
+enabled
+
+
+Remember:
+- start — starts a service now.
+- stop — stops it.
+- restart — restarts it.
+- reload — asks it to apply supported configuration changes without a full stop/start.
+- enable — configures automatic startup at boot.
+- disable — removes automatic startup configuration.
+Step 10. Test Nginx locally
+curl -I http://127.0.0.1
+
+
+Our response included:
+HTTP/1.1 200 OK
+Server: nginx/1.30.5
+
+
+Check the listening port:
+sudo ss -lntp | grep ':80'
+
+
+Check service logs:
+sudo journalctl -u nginx -n 20 --no-pager
+
+
+Check the configuration syntax:
+sudo nginx -t
+
+
+Expected:
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+
+Step 11. Test from your browser
+Open:
+
+http://YOUR_PUBLIC_IP
+
+You saw the default Welcome to nginx! page. This confirmed that the web server was reachable externally through the security group and returned a page successfully.
+
+Welcome to nginx!
+If you see this page, nginx is successfully installed and working. Further configuration is required for the web server, reverse proxy, API gateway, load balancer, content cache, or other features.
+
+For online documentation and support please refer to nginx.org.
+To engage with the community please visit community.nginx.org.
+For enterprise grade support, professional services, additional security features and capabilities please refer to f5.com/nginx.
+
+Thank you for using nginx.
