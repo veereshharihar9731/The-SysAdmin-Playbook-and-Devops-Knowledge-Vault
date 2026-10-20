@@ -1,0 +1,98 @@
+AWS CONCEPTS
+
+ 
+IAM stands for Identity and Access Management.
+IAM decides who can access AWS, what they can do, and which resources they can access.
+
+A key principle is least privilege: give only the permissions required for the job.
+
+The five main IAM building blocks
+
+1. IAM User — an identity
+It is used for a person or an application.
+
+2. IAM Group — a team
+A group lets you assign common permissions to multiple IAM users.
+
+3. IAM Role — temporary permission
+A role is an identity with permissions that a trusted person, application, or AWS service can assume. It provides temporary credentials for the role session.
+
+4. IAM Policy — the permission rules
+A policy says which actions are allowed or denied, on which resources, and sometimes under which conditions.
+
+5. Root user — the original account owner
+The root user is the identity created when the AWS account is registered. It has extensive account-level privileges.
+
+IAM concept		Easy way to remember
+User			Who is accessing?
+Group			Which team are they part of?
+Role			Which temporary identity or permissions can they assume?
+Policy			What are they allowed to do?
+Root user		Which identity owns the AWS account?
+
+IAM policy
+IAM policies turn requirements like this into permissions AWS can evaluate.
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+
+JSON field			Layman's meaning
+Version	Policy 		language version
+Statement			The set of permission rules
+Effect: Allow		Permit the specified action
+Action				What operation is allowed
+Resource			Which AWS resource the rule applies to
+
+
+AWS managed policy: Created and maintained by AWS, such as an AWS-managed policy for EC2 read-only access.
+
+Customer managed policy: Created and maintained in your account to fit your requirements.
+
+Inline policy: A policy embedded directly in one user, group, or role.
+
+IAM roles
+attach an IAM role to the EC2 instance with permission to upload files to only the required S3 bucket. AWS provides temporary credentials for the role
+
+
+Authentication verifies identity — “Who are you?”
+Authorization checks permissions — “What are you allowed to do?”
+
+A IAM user is an individual IAM identity. 
+A IAM group is a collection of IAM users that can share common permissions through policies.
+
+An IAM role is an identity with a permission policy that a trusted user, service, or application can assume. It provides temporary credentials for the session.
+
+Least Privilege -- Granting only the minimum permissions required for a task. For example, a support engineer who needs to view EC2 status should not automatically have permission to terminate instances.
+
+
+AWS managed policies are maintained by AWS. 
+Customer managed policies are created and maintained in your account to suit your requirements.
+
+The explicit Deny takes precedence over an applicable Allow.
+
+An identity-based policy is attached to an identity such as a user or role. 
+A resource-based policy is attached to a resource, such as an S3 bucket, and specifies who can access that resource.
+
+Create users
+Create individual identities for employees who need AWS access.
+
+Create policies
+Define permissions, such as viewing EC2 instances or reading S3 files.
+
+Create groups and attach policies
+For example, put support engineers in Middleware-Support and attach the required policies to that group.
+
+Add users to groups
+Users inherit the permissions granted to their groups. You can also attach policies directly to users when necessary.
+
+Create roles and attach permissions
+Define who can assume each role, then attach the role to an AWS service or workload that needs it.
