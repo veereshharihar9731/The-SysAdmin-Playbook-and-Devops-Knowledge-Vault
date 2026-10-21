@@ -1,0 +1,146 @@
+Create the backend EC2 instance
+In AWS Console:
+
+1. Go to EC2 → Instances → Launch instances.
+2. Name it Python-Backend.
+3. Select Amazon Linux 2023.
+4. Choose an instance type suitable for your account and lab budget.
+5. Select the same VPC as your Nginx instance.
+6. Select a subnet with private network connectivity to Nginx.
+7. Create or select a security group named Backend-SG.
+8. Configure inbound rules as shown below.
+9. Launch the instance and connect using SSH.
+Do not expose port 8080 publicly.
+
+
+3. Configure the security groups
+Nginx server's security group
+
+Inboundtype	Port	Source
+SSH			22		My IP
+HTTP		80		0.0.0.0/0 for this lab
+
+Backend server's security group
+Inboundtype	Port	Source
+SSH			22		My IP, if you connect directly from your computer
+Custom TCP	8080	Nginx server's security group ID
+
+For example, if the Nginx server's security group is sg-0123456789abcdef0, select that security group as the source for the backend's port 8080 rule. Use your real security group ID.
+
+Both instances' outbound rules must allow the required traffic. The default allow-all outbound rule is sufficient for this lab.
+
+4. Install and start the backend
+Connect to the backend EC2 instance and run the following commands.
+Step 4.1 — Check the private IP
+hostname -I
+
+
+Record the private IP address. Your previous backend address was BACKEND_SERVER_IP.
+Step 4.2 — Create the application page
+mkdir -p ~/backend
+echo "Hello from the separate backend EC2 server!" > ~/backend/index.html
+cd ~/backend
+
+
+Step 4.3 — Start the Python server
+python3 -m http.server 8080 --bind 0.0.0.0
+
+
+Keep this terminal open. The Python process must remain running while you test the connection.
+
+Expected terminal output resembles:
+Serving HTTP on 0.0.0.0 port 8080 ...
+
+
+5. Test the backend from the Nginx server
+Switch to your Nginx EC2 SSH session.
+
+Run:
+curl --max-time 5 http://BACKEND_SERVER_IP:8080
+
+
+Replace BACKEND_SERVER_IP if your backend has a different private IP.
+
+Expected output:
+Hello from the separate backend EC2 server!
+
+
+You already achieved this test in your current lab, so your two instances' private network communication is working for that address and port.
+
+6. Configure Nginx to forward requests
+On the Nginx server, create a dedicated proxy configuration.
+
+First inspect the existing server blocks:
+sudo nginx -T
+
+
+Earlier, your default server block in /etc/nginx/nginx.conf conflicted with /etc/nginx/conf.d/backend-proxy.conf. To keep the configuration simple, use just one active port-80 server block.
+
+If you have already removed the default server block from nginx.conf, leave it removed and use the separate file below. Otherwise, remove or disable the default port-80 server block before proceeding.
+
+Create the proxy file:
+sudo vi /etc/nginx/conf.d/backend-proxy.conf
+
+
+Enter the following configuration, replacing the backend IP if necessary:
+server {
+    listen 80;
+    listen [::]:80;
+    server_name _;
+
+    location / {
+        proxy_pass http://BACKEND_SERVER_IP:8080;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+
+Save and exit with :wq.
+Validate the configuration
+sudo nginx -t
+
+
+Proceed only if the syntax test succeeds and there are no conflicting server-name warnings. If a conflict remains, inspect sudo nginx -T and make sure only one intended server block handles port 80.
+
+Reload Nginx:
+sudo systemctl reload nginx
+
+
+7. Test the final output
+Run on the Nginx server:
+curl -i --max-time 5 http://127.0.0.1
+
+
+Expected:
+HTTP/1.1 200 OK
+...
+Hello from the separate backend EC2 server!
+
+
+Now open this URL on your Windows browser:
+http://YOUR_NGINX_PUBLIC_IP
+
+
+Use the Nginx server's current public IP, not the backend's IP.
+
+Expected browser output:
+Hello from the separate backend EC2 server!
+
+Success means the browser reached Nginx, Nginx contacted the backend, and the backend response was returned through the proxy.
+
+8. Troubleshooting checklist
+Result	What to check
+200 OK with backend text	Successful end-to-end connection
+502 Bad Gateway	Verify proxy_pass, backend process and Nginx error log
+Connection timed out from Nginx to backend	Security groups, routing and firewall rules
+Connection refused	Backend process or listening address
+Nginx welcome page	Default server block still handling requests
+
+Useful diagnostic commands:
+sudo nginx -T
+sudo tail -n 30 /var/log/nginx/error.log
+sudo ss -lntp
