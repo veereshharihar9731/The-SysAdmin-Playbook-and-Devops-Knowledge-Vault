@@ -1,0 +1,52 @@
+Security Groups, EBS Storage, Monitoring
+
+Inbound: traffic coming into an instance.
+Outbound: traffic leaving an instance.
+Security groups are stateful: response traffic for an allowed connection is automatically permitted. You don't need a separate inbound rule just for the response packets.
+
+Security group: stateful, attached to network interfaces/instances, allows rules only.
+Network ACL: stateless, associated with subnets, supports allow and deny rules.
+
+EBS storage in AWS EC2
+EBS (Elastic Block Store) provides persistent block storage for your EC2 instance. Think of it as a virtual hard disk attached to your server.
+
+How to create an EBS snapshot
+In the AWS Console:
+1. Open EC2 → Volumes.
+2. Select the volume attached to your test instance.
+3. Choose Actions → Create snapshot.
+4. Add a description, such as nginx-lab-before-change.
+5. Create the snapshot and check its progress under Snapshots.
+
+
+IAM Roles: IAM roles give EC2 permission to access AWS services without storing permanent access keys on the server.
+
+AMI: A template used to launch EC2 instances with a particular OS and software configuration.
+
+EBS snapshot: A point-in-time backup of an EBS volume.
+
+EC2 User Data: User Data lets you run startup scripts when launching an instance, commonly to install packages or configure software.
+
+VPC: Your logically isolated AWS network.
+
+Public subnet: Has a route to an Internet Gateway; public access also requires suitable IP addressing and security rules.
+
+Private subnet: Usually has no direct route to an Internet Gateway.
+
+Internet Gateway: Enables internet connectivity for appropriately routed resources.
+
+NAT Gateway: Allows private-subnet resources to initiate outbound IPv4 internet connections without accepting unsolicited inbound internet connections.
+
+AWS Systems Manager (SSM): SSM Session Manager lets you connect to supported EC2 instances through AWS without opening inbound SSH port 22 or using SSH keys.
+
+Elastic IP: A static public IPv4 address that you can associate with an EC2 instance.
+
+Load Balancing: An Application Load Balancer (ALB) distributes HTTP/HTTPS requests across multiple registered targets.
+
+Auto Scaling: Automatically adds or removes EC2 instances according to configured capacity settings and scaling policies.
+
+CloudWatch Logs: Collects application and system logs when configured with an agent or another supported ingestion method.
+
+CloudWatch Alarms: Changes state when a metric crosses a defined threshold.
+
+High Availability (HA): Design the application so one server or Availability Zone failing does not bring down the whole service.
