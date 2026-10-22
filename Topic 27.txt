@@ -1,0 +1,158 @@
+Application Load Balancer (ALB)
+
+Term			Simple meaning										Example
+Listener		Waits for incoming connections						HTTP port 80
+Target group	The group of backend destinations					Two EC2 servers on port 8080
+Health check	Tests whether a backend can respond as expected		HTTP GET /health
+Listener rule	Decides where a request goes						/api/* routes to one target group
+Security group	Controls allowed network traffic					ALB accepts HTTP; backends accept traffic from ALB-SG
+
+ALB: Distributes incoming HTTP/HTTPS requests across registered targets.
+
+Target group: Defines where requests are forwarded and how backend health is checked.
+
+Health check: ALB checks the configured path and port; your Python servers return HTTP 200.
+
+Security groups: ALB accepts public HTTP traffic, while backend port 8080 accepts traffic from the ALB security group.
+
+High availability: Multiple backends help keep the application available when one target fails, provided the ALB can route to healthy targets.
+
+Create the backend security group
+Open AWS Console → EC2 → Security Groups → Create security group.
+
+Use these settings:
+Setting	Value
+Security group name	Backend-SG
+Description	Allow traffic from ALB to backend
+VPC	Default VPC, or the VPC you'll use for all lab resources
+
+Inbound rules:
+Type		Port	Source
+Custom TCP	8080	Add later, after creating ALB-SG
+SSH			22		My IP, only if you need SSH access
+
+You can create Backend-SG first without the port 8080 rule, then add it after creating the ALB security group.
+3. Create the ALB security group
+Create another security group:
+- Name: ALB-SG
+- Use the same VPC as Backend-SG.
+Inbound rule:
+Type	Port	Source
+HTTP	80		0.0.0.0/0
+
+Keep the default outbound rules unless you have a specific reason to change them.
+
+Now return to Backend-SG and add:
+Type		Port	Source
+Custom TCP	8080	ALB-SG security group ID
+
+Important: Port 8080 should accept traffic from the ALB security group, not from the entire internet.
+
+4. Launch Backend 1 and Backend 2
+
+For applicationserver1, paste:
+#!/bin/bash
+dnf install -y python3
+mkdir -p /opt/backend
+echo "Hello from Backend 1" > /opt/backend/index.html
+
+cat > /etc/systemd/system/backend.service <<'EOF'
+[Unit]
+Description=Python Backend Application
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -m http.server 8080 --bind 0.0.0.0 --directory /opt/backend
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable --now backend.service
+
+
+For applicationserver2, use the same script but change the response line to:
+echo "Hello from Backend 2" > /opt/backend/index.html
+
+
+Launch both instances and wait until they are running and pass their EC2 status checks.
+
+This user data script installs Python, creates the service, and enables it to start automatically when the instance boots. Allow a few minutes for initialization.
+5. Create the target group
+Go to EC2 → Target Groups → Create target group.
+
+Configure:
+Setting	Value
+Target type	Instances
+Target group name	Middleware-TG
+Protocol	HTTP
+Port	8080
+VPC	Same VPC as the backend instances
+Health check protocol	HTTP
+Health check path	/
+Success codes	200
+
+Click Next, select both applicationserver1 and applicationserver2, confirm that each target uses port 8080, and click Include as pending below (or the equivalent registration action shown in your console).
+
+Create the target group.
+6. Create the Application Load Balancer
+Go to EC2 → Load Balancers → Create load balancer → Application Load Balancer.
+
+Configure:
+Setting	Value
+Load balancer name	Middleware-ALB
+Scheme	Internet-facing
+IP address type	IPv4
+VPC	Same VPC
+Mappings	Select at least two suitable subnets in different AZs
+Security group	ALB-SG
+Listener	HTTP : 80
+Default action	Forward to Middleware-TG
+
+For an internet-facing ALB, use public subnets with routes to an Internet Gateway. You can use the default VPC if its subnets and routing meet these requirements.
+
+Create the ALB.
+7. Verify the target group
+Wait for the ALB state to become Active.
+
+Then open:
+
+EC2 → Target Groups → Middleware-TG → Targets
+
+Wait for both targets to become Healthy.
+Expected target health
+
+applicationserver1
+
+Healthy
+
+applicationserver2
+
+Healthy
+
+
+If either target is unhealthy, inspect Health status details before changing any configuration.
+8. Test the load balancer in your browser
+1. Open EC2 → Load Balancers → Middleware-ALB.
+2. Copy the actual DNS name displayed by AWS.
+3. Open it in your browser with http:// at the beginning.
+Example format only:
+
+http://<your-actual-alb-dns-name>
+
+You should see one of these responses:
+- Hello from Backend 1
+- Hello from Backend 2
+Refresh the page several times to test the load balancer. The two responses may not alternate perfectly on every request.
+
+9. Troubleshooting reference
+Error	What to check
+DNS_PROBE_FINISHED_NXDOMAIN	Copy the actual DNS name from the ALB console; verify the ALB exists
+503 Service Temporarily Unavailable	Target group has no healthy targets or no usable registered targets
+504 Gateway Time-out	Backend response, port 8080, security groups, routes and network ACLs
+Target Request timed out	Confirm the backend service is running and port 8080 is reachable from the ALB
+Target Connection refused	Confirm the application is listening on port 8080
