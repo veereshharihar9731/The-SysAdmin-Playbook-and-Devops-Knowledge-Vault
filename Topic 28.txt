@@ -1,0 +1,90 @@
+HTTPS and SSL/TLS
+
+HTTPS encrypts traffic between the browser and ALB. The ALB decrypts it and forwards HTTP traffic to the backend servers. This is called TLS termination.
+
+Term				Simple meaning																		Example
+SSL/TLS				Technology used to encrypt network traffic; TLS is the modern protocol				HTTPS
+Certificate			Proves the server's identity and contains its public key							Certificate for your-domain.com
+Private key			Secret key used by the server during TLS operations									Must never be published to GitHub
+Public key			Key included in the certificate														Used as part of public-key cryptography
+Certificate chain	Links the server certificate to a trusted certificate authority						Server → intermediate CA → root CA
+HTTPS listener		ALB listener that accepts encrypted requests										Port 443
+ACM					AWS Certificate Manager, used to provision and manage supported certificates		Certificate attached to ALB
+TLS termination		ALB decrypts HTTPS traffic before forwarding it										HTTPS :443 → HTTP :8080
+
+
+Launch two backend EC2 instances and configure the backend security group.
+Create the target group on HTTP port 8080 and confirm both targets are healthy.
+Open AWS Certificate Manager in the same AWS Region as your ALB and request a public certificate for your domain.
+Complete DNS validation by adding the DNS records ACM provides.
+Add inbound HTTPS port 443 to ALB-SG.
+Add an HTTPS listener on port 443 and attach the validated ACM certificate.
+Forward HTTPS requests to the backend target group.
+Configure your domain's DNS to point to the ALB using the appropriate DNS alias or record.
+
+
+Command to generate private key and certificate 
+
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /opt/tomcat/conf/tomcat.key -out /opt/tomcat/conf/tomcat.crt
+
+
+
+Auto Scaling and High Availability
+
+Term						Simple meaning
+Launch template				Blueprint for launching EC2 instances
+Auto Scaling Group (ASG)	Maintains the required number of EC2 instances
+Minimum capacity			Lowest number of instances to maintain
+Desired capacity			Number of instances the ASG should currently run
+Maximum capacity			Highest number of instances the ASG may launch
+Scaling policy				Rule for adding or removing instances
+Health replacement			Replaces instances that fail configured health checks
+Multi-AZ					Distributes resources across Availability Zones for resilience
+
+
+Create a launch template with Amazon Linux and your backend startup script.
+Create an ALB target group.
+Create an Auto Scaling Group across at least two AZs.
+Attach the target group to the ASG.
+Set minimum 2, desired 2, maximum 4.
+Configure a scaling policy, such as target tracking on average CPU utilization.
+Verify that the instances register as healthy in the target group.
+Terminate one lab instance and observe whether the ASG replaces it.
+Check CloudWatch metrics and ASG activity history.
+
+
+
+
+Tomcat administration on AWS
+
+Topic					What you'll learn
+Java and JVM			JDK, Java version, heap, memory
+Installation			Install Java and Tomcat on EC2
+Deployment				Deploy a .war file
+Configuration			server.xml, application configuration, environment variables
+Service management		Start, stop, restart, enable Tomcat
+Logs					catalina.out, application logs, systemd journal
+Ports					HTTP connector, shutdown port, port conflicts
+Troubleshooting			HTTP 404, 500, 503, startup failures, memory problems
+Production practices	Non-root service user, permissions, monitoring, backups
+
+3. Hands-on lab plan
+1. Launch a fresh Amazon Linux EC2 instance.
+2. Install a supported Java version.
+3. Install a compatible Tomcat version.
+4. Configure Tomcat as a systemd service.
+5. Deploy a sample Java web application.
+6. Verify the application locally using curl.
+7. Configure the ALB or Nginx to forward traffic to Tomcat.
+8. Review logs and troubleshoot common failures.
+9. Monitor CPU, memory, disk, and service status.
+
+
+java -version
+systemctl status tomcat
+systemctl restart tomcat
+journalctl -u tomcat --since "10 minutes ago"
+ss -lntp
+curl -I http://127.0.0.1:8080/
+df -h
+free -m
