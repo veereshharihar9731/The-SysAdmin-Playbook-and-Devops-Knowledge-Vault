@@ -1,0 +1,121 @@
+AWS VPC
+
+A Virtual Private Cloud (VPC) is your own logically isolated network inside AWS.
+
+VPC = Company network
+Subnet = Network segment
+Route table = Routing instructions
+Internet Gateway (IGW) = Internet connection for the VPC
+Security Group = Instance-level virtual firewall
+EC2 = Server inside the network
+
+What is a subnet?
+A subnet is a smaller IP network inside a VPC. Each subnet belongs to exactly one Availability Zone.
+
+Learn public vs. private subnets
+Public subnet: Has a route such as 0.0.0.0/0 → igw-...
+Private subnet: Does not have a direct route to an Internet Gateway. It may use a NAT Gateway for outbound internet access.
+
+CIDR
+CIDR defines how many IP addresses belong to a network.
+
+Why do we create multiple subnets
+- Network organization: Separate web, application, and database resources.
+- Security: Apply different network controls to different subnet groups.
+- High availability: Place resources in different Availability Zones.
+- Routing: Give different subnet groups different network paths.
+
+Public subnet: Has a route to an Internet Gateway.
+Private subnet: Does not have a direct route to an Internet Gateway.
+
+
+CIDR Planning and Subnetting
+
+Layer			Subnet type		Example CIDR
+Load Balancer	Public			10.0.0.0/24
+Web / Proxy		Private			10.0.1.0/24
+Tomcat App		Private			10.0.2.0/24
+Database		Private			10.0.3.0/24
+
+Route Tables and Traffic Flow
+
+Route Table
+A route table is a set of rules that tells a VPC where to send network traffic.
+
+What does the local route mean?
+Your VPC CIDR is:
+
+172.31.0.0/16
+
+AWS automatically creates a route:
+
+172.31.0.0/16 → local
+
+This allows resources within the VPC to communicate with one another using their private IP addresses, subject to security controls.
+
+
+
+What does 0.0.0.0/0 mean?
+0.0.0.0/0 means all IPv4 destinations.
+
+It is commonly used as a default route.
+
+Your route:
+
+0.0.0.0/0 → igw-01bcb9e922e0d5824
+
+means that traffic without a more specific matching route can be sent to the Internet Gateway.
+
+However, AWS uses the most specific matching route.
+
+Internet Gateway (IGW)?
+An Internet Gateway connects a VPC to the internet.
+
+What is a route table?
+A collection of routing rules that determines where network traffic is directed.
+
+What is the local route?
+A route automatically created by AWS that enables communication within the VPC CIDR.
+
+What does 0.0.0.0/0 represent?
+All IPv4 destinations; it is commonly used as a default route.
+
+What makes a subnet public?
+Its associated route table contains a route to an Internet Gateway.
+
+How does AWS select a route?
+It uses the most specific matching route, also known as longest-prefix match.
+
+Internet Gateway vs. NAT Gateway
+
+Internet Gateway (IGW): Provides a path between a VPC and the internet.
+NAT Gateway: Allows resources in private subnets to initiate connections to the internet without allowing unsolicited inbound internet connections directly to those resources.
+
+Internet Gateway (IGW)
+An Internet Gateway is attached to a VPC.
+
+It enables eligible resources in public subnets to communicate with the internet.
+
+NAT Gateway
+The NAT Gateway translates the private instance's source address to its public address for outbound communication.
+
+Feature											Internet Gateway											NAT Gateway
+Purpose											Connect VPC to internet										Enable private subnet outbound internet access
+Used by											Public subnet resources										Private subnet resources
+Allows direct inbound internet connections		Possible with public IP and security rules					No unsolicited inbound connections
+Route target									IGW															NAT Gateway
+Public IPv4 address								Needed by an instance for direct IPv4 internet access		NAT Gateway uses an Elastic IP for public NAT
+Cost											No hourly charge for the IGW itself							Hourly and data processing charges apply
+
+
+Why do private subnets use a NAT Gateway?
+To allow private resources to initiate outbound internet connections, such as downloading packages or updates, without being directly accessible from the internet.
+
+Can an Internet Gateway provide internet access to an EC2 instance without a public IPv4 address?
+For direct IPv4 internet access through an IGW, the instance needs a public IPv4 address or Elastic IP. Other architectures, such as NAT, can provide outbound access.
+
+Can the internet initiate a connection to a private EC2 instance through a NAT Gateway?
+No. A NAT Gateway supports outbound-initiated connections and their responses, not unsolicited inbound connections.
+
+Is a NAT Gateway free?
+No. AWS charges for NAT Gateway usage and data processing. It is important to delete NAT Gateways when they are no longer needed in a learning lab.
