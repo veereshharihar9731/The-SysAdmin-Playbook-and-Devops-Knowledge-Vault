@@ -1,0 +1,116 @@
+S3 ---> Simple Storage Service
+Amazon S3 is an object storage service used to store and retrieve data from anywhere.
+
+Term		Meaning
+Bucket		A container for storing objects
+Object		A file stored in S3
+Key			The object's unique name within the bucket
+
+
+Feature				S3							EBS												EFS
+Storage type		Object						Block											File
+Typical use			Backups, files, logs		EC2 disk										Shared filesystem
+Attached to EC2?	No							Yes												Mounted by clients
+Access				API / SDK / CLI / Console	Block device									Filesystem
+Persistence			Independent of EC2			Independent of EC2 when configured to persist	Independent of EC2
+
+Storage class					Best use
+S3 Standard						Frequently accessed data
+S3 Intelligent-Tiering			Access patterns are unpredictable
+S3 Standard-IA					Infrequently accessed data
+S3 One Zone-IA					Infrequent data stored in one AZ
+S3 Glacier Instant Retrieval	Archive data needing immediate retrieval
+S3 Glacier Flexible Retrieval	Archive data with retrieval time flexibility
+S3 Glacier Deep Archive			Long-term archival with slower retrieval
+
+
+Block Public Access: Helps prevent unintended public access.
+Bucket policies: Resource-based permissions written in JSON.
+IAM policies: Control what an IAM identity can do.
+Object Ownership: Controls ownership and ACL behavior.
+Encryption: Protects stored data.
+
+Buckets, Objects, and Versioning
+
+Bucket names must be globally unique.
+Names are generally 3–63 characters long.
+Use lowercase letters, numbers, periods, and hyphens.
+Bucket names cannot contain underscores.
+Bucket names cannot be changed after creation.
+A bucket belongs to a specific AWS Region.
+
+S3 object
+Object data — the actual file contents.
+Object key — the object's name, including any prefix.
+Metadata — information about the object.
+Version ID — if versioning is enabled.
+
+S3 Versioning
+Versioning keeps multiple versions of an object in the same bucket.
+
+What happens when an object is deleted?
+With versioning enabled, a normal delete typically adds a delete marker as the current version. Previous versions remain stored and can be recovered.
+
+The previous versions do not disappear automatically, so storage charges can continue. Lifecycle policies can help manage older versions.
+
+
+S3 Lifecycle Policies
+
+Object age	Action
+Day 0		Store in S3 Standard
+Day 30		Transition to S3 Standard-IA
+Day 90		Transition to S3 Glacier
+Day 365	 	Expire objects, if retention requirements allow
+
+This is useful for application logs and backups.
+
+Production note: Before expiring or deleting data, confirm your organization's retention requirements. Some data must be kept for compliance or recovery purposes.
+
+Durability: How likely data is to remain intact over time.
+Availability: How often data is accessible when requested.
+
+Access Control and Security
+
+Feature						Purpose
+IAM Policy					Grants permissions to IAM users, groups, or roles
+Bucket Policy				Defines access permissions directly on a bucket
+S3 Block Public Access		Helps prevent public access
+IAM Role					Allows AWS services, such as EC2, to access S3 without storing long-term access keys
+
+IAM Policy — Identity-based
+An IAM policy is attached to an IAM identity, such as a user or role.
+
+Example: An EC2 IAM role is allowed to read files from a specific S3 bucket.
+Bucket Policy — Resource-based
+A bucket policy is attached directly to the S3 bucket.
+
+Example: The bucket owner allows a specific IAM role to access objects in the bucket.
+
+S3 Block Public Access
+By default, S3 buckets are private unless access is granted through permissions.
+
+S3 Block Public Access provides controls to prevent public access, including access that might otherwise be granted through bucket policies or ACLs.
+
+For production buckets containing logs, backups, or application files, the normal recommendation is:
+
+Keep Block Public Access enabled unless public access is explicitly required and approved.
+
+
+EC2 accesses S3 securely
+Create an IAM role trusted by EC2.
+Attach a policy granting only the required S3 permissions.
+Attach the role to the EC2 instance.
+The application or AWS CLI obtains temporary credentials automatically.
+The instance accesses the permitted S3 objects.
+
+S3 Replication
+Replication type				Meaning
+Same-Region Replication (SRR)	Copies objects to another bucket in the same AWS Region
+Cross-Region Replication (CRR)	Copies objects to a bucket in a different AWS Region
+
+S3 Replication Requirements
+At a high level, replication requires:
+- Versioning enabled on both source and destination buckets.
+- A replication rule.
+- An IAM role that allows S3 to replicate objects.
+- Appropriate permissions on the destination bucket.
