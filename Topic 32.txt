@@ -1,0 +1,35 @@
+Amazon Route 53
+DNS (Domain Name System) translates a domain name into information such as an IP address.
+
+Manage DNS records for your domain.
+Route users to application endpoints.
+Support health-check-based DNS failover.
+Route traffic using different routing policies.
+Manage public and private DNS zones.
+
+Root DNS servers — direct the resolver toward the appropriate top-level domain.
+TLD DNS servers — for example, .com servers direct it toward the domain's authoritative DNS servers.
+Authoritative DNS servers — provide the DNS records for the domain.
+Resolver — returns the result to the requesting client.
+
+Term						Meaning
+Domain						A name such as example.com
+Subdomain					A name such as app.example.com
+DNS resolver				Finds DNS answers for clients
+Authoritative DNS server	Holds the definitive DNS records for a domain or zone
+TTL							Time To Live;how long a DNS answer may be cached
+DNS record					A rule containing information about a domain
+
+Hosted Zone
+A hosted zone is a container for DNS records that define how a domain or subdomain should be resolved.
+
+
+DNS Record Types
+
+A Record — IPv4 Address
+AAAA Record — IPv6 Address
+CNAME Record — Alias to Another DNS Name
+Alias Record — AWS Route 53 Feature
+MX Record — Mail Exchange
+TXT Record — Text Information
+NS Record — Name Server

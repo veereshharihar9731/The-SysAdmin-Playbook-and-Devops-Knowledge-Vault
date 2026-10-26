@@ -1,0 +1,68 @@
+EBS ------> Elastic Block Store
+Amazon EBS (Elastic Block Store) is persistent block storage for EC2 instances.
+
+Block Storage?
+EBS is called block storage because it stores data in blocks that the operating system can read and write.
+
+EBS: Tomcat server's operating system and application disk.
+S3: WAR files, backups, archived logs.
+EFS: Shared application files across multiple EC2 instances.
+
+Volume type		Best use
+gp3				General-purpose SSD; common choice for EC2
+gp2				Older general-purpose SSD
+io2				High-performance, IOPS-intensive workloads
+st1				Throughput-intensive HDD workloads
+sc1				Infrequently accessed, low-cost HDD workloads
+
+IOPS: Number of input/output operations per second.
+Throughput: Amount of data transferred per second.
+
+
+Volumes, Snapshots, and Backups
+EBS volume is a virtual disk that you can attach to an EC2 instance.
+
+EBS Snapshot
+An EBS snapshot is a point-in-time backup of an EBS volume.
+
+Snapshots are stored by AWS in managed storage.
+Snapshots are incremental after the first snapshot.
+AWS stores only the changed blocks needed for subsequent snapshots.
+You can create a new EBS volume from a snapshot.
+Snapshots can be copied to another Region for disaster recovery.
+
+
+A snapshot is a disk backup.
+An AMI is a machine image used to launch an EC2 instance. An EBS-backed AMI typically references snapshots of its root and any included data volumes.
+
+
+Expanding a Volume & Troubleshooting Disk Space
+
+Command			Purpose
+lsblk			Shows disks, partitions, and their sizes
+df -hT			Shows filesystem space and filesystem type
+df -i			Shows inode usage
+du -sh /path	Shows the size of a directory
+findmnt			Shows mounted filesystems
+
+
+IOPS, Throughput, Latency & Performance
+
+IOPS: How many vehicles pass per second.
+Throughput: How much cargo those vehicles carry.
+Latency: How long a vehicle takes to reach its destination.
+
+
+Random I/O
+The application accesses data in many different locations.
+
+Database reads and writes
+Applications accessing many small files
+Random metadata operations
+
+Sequential I/O
+The application reads or writes large blocks of data in order.
+
+Large file transfers
+Backups
+Streaming large files
