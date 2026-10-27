@@ -1,0 +1,350 @@
+AWS Middleware Project — Complete Setup From Scratch
+
+Plan the resources
+Resource	Name	Configuration
+Region		Sydney	ap-southeast-2
+VPC	Middleware-Project-VPC	10.20.0.0/16
+Public subnet A	Public-Subnet-A	10.20.1.0/24
+Public subnet B	Public-Subnet-B	10.20.2.0/24
+Private subnet A	App-Subnet-A	10.20.11.0/24
+Private subnet B	App-Subnet-B	10.20.12.0/24
+Internet gateway	Middleware-Project-IGW	Attached to the VPC
+Public route table	Middleware-Public-RT	Default route to IGW
+Private route table	Middleware-Private-RT	Local VPC route only
+ALB security group	Middleware-ALB-SG	HTTP 80 from internet
+App security group	Middleware-App-SG	TCP 8080 from ALB SG only
+
+
+3. Create the VPC
+1. Open the AWS VPC Console.
+2. Check the region in the top-right corner: Asia Pacific (Sydney) — ap-southeast-2.
+3. Select Your VPCs → Create VPC.
+4. Choose VPC only.
+5. Enter:
+   - Name tag: Middleware-Project-VPC
+   - IPv4 CIDR: 10.20.0.0/16
+   - IPv6 CIDR: No IPv6 CIDR block
+   - Tenancy: Default
+6. Click Create VPC.
+A VPC is your isolated network in AWS. The /16 range provides private IP addresses for your resources.
+
+Checkpoint: Your VPC should show 10.20.0.0/16 and state Available. Save the VPC ID.
+4. Create four subnets
+Open VPC → Subnets → Create subnet. Select Middleware-Project-VPC, then add the following subnets. Depending on the console layout, you may add multiple subnet entries before creating them.
+Subnet name	Availability Zone	IPv4 CIDR
+Public-Subnet-A	ap-southeast-2a	10.20.1.0/24
+Public-Subnet-B	ap-southeast-2b	10.20.2.0/24
+App-Subnet-A	ap-southeast-2a	10.20.11.0/24
+App-Subnet-B	ap-southeast-2b	10.20.12.0/24
+
+Select Create subnet.
+Enable public IP assignment on the public subnets
+1. Select Public-Subnet-A.
+2. Choose Actions → Edit subnet settings.
+3. Enable Auto-assign public IPv4 address and save.
+4. Repeat for Public-Subnet-B.
+Leave automatic public IPv4 assignment disabled on both application subnets.
+
+Checkpoint: All four subnets should belong to your custom VPC, with the correct CIDRs and Availability Zones.
+5. Create and attach an Internet Gateway
+1. Open VPC → Internet gateways → Create internet gateway.
+2. Name it Middleware-Project-IGW.
+3. Create it.
+4. Select it and choose Actions → Attach to a VPC.
+5. Select Middleware-Project-VPC and attach it.
+An Internet Gateway provides the VPC's internet route. A subnet also needs an appropriate route table and public IP addressing for resources to use it.
+6. Create the public route table
+1. Open VPC → Route tables → Create route table.
+2. Name: Middleware-Public-RT.
+3. VPC: Middleware-Project-VPC.
+4. Create the route table.
+5. Open its Routes tab → Edit routes → Add route.
+6. Enter:
+   - Destination: 0.0.0.0/0
+   - Target: your Middleware-Project-IGW
+7. Save changes.
+8. Open Subnet associations → Edit subnet associations.
+9. Select Public-Subnet-A and Public-Subnet-B.
+10. Save associations.
+The route table should contain both the automatic local route (10.20.0.0/16) and the internet route (0.0.0.0/0).
+7. Create the private route table
+1. Choose Create route table.
+2. Name: Middleware-Private-RT.
+3. VPC: Middleware-Project-VPC.
+4. Create it.
+5. Open Subnet associations → Edit subnet associations.
+6. Select App-Subnet-A and App-Subnet-B.
+7. Save.
+Keep only the local VPC route for now. Do not add a default route to the Internet Gateway. We will use Systems Manager VPC endpoints for administration instead of giving the application servers direct internet access.
+8. Create the security groups
+Open VPC → Security groups → Create security group.
+A. Middleware-ALB-SG
+- Name: Middleware-ALB-SG
+- VPC: Middleware-Project-VPC
+- Inbound rule:
+  - Type: HTTP
+  - Protocol: TCP
+  - Port: 80
+  - Source: 0.0.0.0/0
+- Outbound: leave the default outbound rule for this lab.
+This allows browsers to reach the load balancer over HTTP.
+B. Middleware-App-SG
+- Name: Middleware-App-SG
+- VPC: Middleware-Project-VPC
+- Inbound rule:
+  - Type: Custom TCP
+  - Port: 8080
+  - Source: select the security group Middleware-ALB-SG, not an IP address range.
+- Outbound: leave the default outbound rule for this lab.
+This permits traffic from the ALB to the backend application servers only. Do not add public inbound rules for ports 8080 or 22.
+C. Middleware-Endpoint-SG
+We'll need this for Systems Manager:
+- Name: Middleware-Endpoint-SG
+- VPC: Middleware-Project-VPC
+- Inbound rule:
+  - Type: HTTPS
+  - Port: 443
+  - Source: select the security group Middleware-App-SG.
+- Outbound: leave the default outbound rule.
+This lets the EC2 instances connect to the Systems Manager interface endpoints securely.
+
+9. Create the S3 bucket
+1. Open the Amazon S3 Console.
+2. Select Create bucket.
+3. Bucket name: choose a globally unique name, such as middleware-project-artifacts-<unique-number>.
+4. AWS Region: ap-southeast-2.
+5. Keep Block all public access enabled.
+6. Keep default encryption enabled.
+7. Select Create bucket.
+Save the exact bucket name. Do not make it public.
+10. Create the EC2 IAM role
+This role lets the EC2 instances access S3 and Systems Manager without storing AWS access keys on the servers.
+1. Open the IAM Console.
+2. Select Roles → Create role.
+3. Trusted entity type: AWS service.
+4. Use case: EC2.
+5. Click Next.
+6. Attach the AWS-managed policy AmazonSSMManagedInstanceCore.
+7. Complete the role creation with the name Middleware-Project-EC2-Role.
+Next, attach a custom S3 policy to this role. Replace YOUR-BUCKET-NAME with your actual bucket name.
+
+Choose Add permissions → Create inline policy → JSON and enter:
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": "arn:aws:s3:::YOUR-BUCKET-NAME"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": "arn:aws:s3:::YOUR-BUCKET-NAME/*"
+    }
+  ]
+}
+
+
+Name the policy Middleware-Project-S3-Access and save it.
+
+Checkpoint: The role Middleware-Project-EC2-Role must have both AmazonSSMManagedInstanceCore and Middleware-Project-S3-Access attached.
+11. Create Systems Manager VPC endpoints
+This step is essential because your application servers are in private subnets without a NAT Gateway.
+
+Open VPC → Endpoints → Create endpoint. Create these two interface endpoints separately.
+Endpoint 1
+- Name: Middleware-SSM-Endpoint
+- Service: com.amazonaws.ap-southeast-2.ssm
+
+
+Endpoint 2
+- Name: Middleware-SSM-Messages-Endpoint
+- Service: com.amazonaws.ap-southeast-2.ssmmessages
+
+
+For each endpoint:
+1. Endpoint type: Interface.
+2. VPC: Middleware-Project-VPC.
+3. Subnets: select App-Subnet-A and App-Subnet-B.
+4. Enable Private DNS names.
+5. Security group: Middleware-Endpoint-SG.
+6. Create the endpoint.
+Wait until both endpoints show Available. Interface endpoints incur charges, so review the current AWS pricing before proceeding.
+
+For S3 access from private subnets, you can also add a Gateway endpoint for com.amazonaws.ap-southeast-2.s3, associate it with Middleware-Private-RT, and keep your bucket private. The S3 gateway endpoint has no additional endpoint usage charge, although S3 itself can incur charges.
+12. Create the EC2 launch template
+A launch template defines how each application server is created. We'll use an Auto Scaling Group to launch and maintain two servers.
+1. Open the EC2 Console.
+2. Select Launch templates → Create launch template.
+3. Configure the following:
+Setting	Value
+Launch template name	Middleware-App-Launch-Template
+AMI	Amazon Linux 2023
+Instance type	t3.micro, subject to availability and cost
+Key pair	Proceed without a key pair
+Network	Do not select a subnet in the template
+Security group	Middleware-App-SG
+IAM instance profile	Middleware-Project-EC2-Role
+Root volume	8 GiB, gp3, encrypted
+
+The instance profile field is important: it connects the IAM role to the EC2 instances.
+Add the user data script
+Expand Advanced details → User data. Enter this script exactly:
+#!/bin/bash
+set -euxo pipefail
+
+mkdir -p /opt/backend
+
+cat > /opt/backend/index.html <<'EOF'
+<html>
+  <head><title>Middleware AWS Lab</title></head>
+  <body>
+    <h1>Hello from the AWS application server!</h1>
+    <p>Served by an EC2 instance in a private subnet.</p>
+  </body>
+</html>
+EOF
+
+cat > /etc/systemd/system/backend.service <<'EOF'
+[Unit]
+Description=Middleware Project Backend
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/backend
+ExecStart=/usr/bin/python3 -m http.server 8080 --bind 0.0.0.0 --directory /opt/backend
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable --now backend.service
+
+
+This creates a simple web application on port 8080. It doesn't require downloading packages from the internet, assuming Python 3 is available in the selected AMI.
+
+Before creating instances: Verify that the IAM role, endpoints, security groups, and launch template are ready. This helps avoid the SSM connection and startup errors you encountered earlier.
+
+Create the launch template.
+13. Create the target group
+The target group identifies which EC2 instances the ALB will send traffic to.
+1. Open EC2 → Target Groups → Create target group.
+2. Target type: Instances.
+3. Name: Middleware-App-TG.
+4. Protocol: HTTP.
+5. Port: 8080.
+6. VPC: Middleware-Project-VPC.
+7. Health check protocol: HTTP.
+8. Health check path: /.
+9. Success codes: 200.
+10. Create the target group.
+You do not need to manually register instances if the Auto Scaling Group will manage registration.
+14. Create the Application Load Balancer
+1. Open EC2 → Load Balancers → Create load balancer.
+2. Choose Application Load Balancer.
+3. Name: Middleware-Project-ALB.
+4. Scheme: Internet-facing.
+5. IP address type: IPv4.
+6. VPC: Middleware-Project-VPC.
+7. Mappings: select Public-Subnet-A and Public-Subnet-B.
+8. Security group: Middleware-ALB-SG.
+9. Listener: HTTP port 80.
+10. Default action: forward to Middleware-App-TG.
+11. Create the load balancer.
+Wait until the ALB is active.
+15. Launch two EC2 instances through Auto Scaling
+Instead of manually launching two servers separately, use an Auto Scaling Group (ASG). It launches the instances from your template and registers them with the target group.
+1. Open EC2 → Auto Scaling Groups → Create Auto Scaling group.
+2. Name: Middleware-Project-ASG.
+3. Select Middleware-App-Launch-Template and its latest version.
+4. Select VPC: Middleware-Project-VPC.
+5. Choose private subnets:
+   - App-Subnet-A
+   - App-Subnet-B
+6. On the load balancing step, select Attach to an existing load balancer and choose Middleware-App-TG.
+7. Enable Elastic Load Balancing health checks if offered.
+8. Set capacity:
+   
+   | Setting | Value |
+   |---|---:|
+   | Desired capacity | 2 |
+   | Minimum capacity | 2 |
+   | Maximum capacity | 3 |
+9. Skip scaling policies for now; we'll add them after verifying the basic setup.
+10. Review and create the Auto Scaling Group.
+AWS should now launch two EC2 instances, ideally one in each Availability Zone, using your private subnets and the launch template.
+16. Verify the result
+Go to EC2 → Instances and confirm:
+- Two instances are running.
+- Both are in Middleware-Project-VPC.
+- Both are in private application subnets.
+- Neither has a public IPv4 address.
+- Both have Middleware-App-SG.
+- Both have the Middleware-Project-EC2-Role instance profile.
+Then open EC2 → Target Groups → Middleware-App-TG → Targets.
+
+Initially, targets may show Initial or Unhealthy while bootstrapping. Wait a few health-check intervals.
+
+Finally, open EC2 → Load Balancers → Middleware-Project-ALB, copy its DNS name, and open it in your browser using http:// followed by the DNS name.
+
+Expected application response:
+Hello from the AWS application server!
+
+If the targets remain unhealthy, don't immediately recreate everything. First connect through Session Manager and inspect the backend service and cloud-init logs.
+Cost and safety checklist
+- Keep EC2 instances in private subnets.
+- Do not open port 8080 or SSH port 22 to the internet.
+- Remember that the ALB, EC2 instances, interface endpoints, and monitoring services can incur charges.
+- Stop or delete billable resources when you finish the lab.
+Recommended checkpoint order: Finish Sections 3–8 first and verify networking; then complete Sections 9–11 for IAM and endpoints; finally create the launch template, target group, ALB, and Auto Scaling Group. This gives us clear checkpoints before launching the application servers.
+
+****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+
+AWS Middleware Project — Step-by-Step Order
+1. Create VPC — Middleware-Project-VPC
+2. Create 4 subnets:
+   - Public-Subnet-A
+   - Public-Subnet-B
+   - App-Subnet-A
+   - App-Subnet-B
+3. Create Internet Gateway — Middleware-Project-IGW
+4. Attach Internet Gateway to the VPC.
+5. Create Public Route Table — Middleware-Public-RT
+6. Add route 0.0.0.0/0 → Internet Gateway.
+7. Associate both public subnets with the public route table.
+8. Create Private Route Table — Middleware-Private-RT
+9. Associate both application subnets with the private route table.
+10. Enable auto-assign public IPv4 for both public subnets.
+11. Create Security Group — Middleware-ALB-SG
+12. Create Security Group — Middleware-App-SG
+13. Create Security Group — Middleware-Endpoint-SG
+14. Create S3 bucket — Middleware-Project-Bucket (use a globally unique bucket name).
+15. Create IAM role — Middleware-Project-EC2-Role.
+16. Attach AmazonSSMManagedInstanceCore to the IAM role.
+17. Create and attach the S3 access policy to the IAM role.
+18. Create VPC endpoint — com.amazonaws.ap-southeast-2.ssm.
+19. Create VPC endpoint — com.amazonaws.ap-southeast-2.ssmmessages.
+20. Create S3 Gateway VPC endpoint.
+21. Create EC2 Launch Template — Middleware-App-Launch-Template.
+22. Configure Amazon Linux 2023, t3.micro, 8 GiB encrypted EBS, IAM role, security group, and User Data.
+23. Create Target Group — Middleware-App-TG, HTTP port 8080.
+24. Create Application Load Balancer — Middleware-Project-ALB.
+25. Configure ALB listener — HTTP port 80 → Middleware-App-TG.
+26. Create Auto Scaling Group — Middleware-Project-ASG.
+27. Select both private application subnets for the Auto Scaling Group.
+28. Attach the target group to the Auto Scaling Group.
+29. Set desired capacity 2, minimum 2, maximum 3.
+30. Verify both EC2 instances are running.
+31. Verify both target group targets become Healthy.
+32. Test the ALB DNS name in a browser.
+33. Configure CloudWatch metrics and alarms.
+34. Configure CloudTrail.
+35. Test Auto Scaling and target replacement.
+36. Verify S3 access from EC2.
+37. Clean up billable resources after completing the lab.
+Start with Step 1: Create the VPC. Then proceed to Step 2: Create the four subnets.

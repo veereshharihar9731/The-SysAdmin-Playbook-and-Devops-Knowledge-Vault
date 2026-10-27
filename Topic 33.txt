@@ -1,0 +1,73 @@
+Amazon CloudWatch and AWS CloudTrail
+
+Amazon CloudWatch
+Monitor application and infrastructure health.
+
+AWS CloudTrail
+Track actions performed in your AWS account.
+
+CloudWatch										CloudTrail
+Monitors performance and operational health		Records AWS account activity and API actions
+Metrics, logs, alarms and dashboards			Events, event history and trails
+“Why is my server slow?”						“Who deleted my security group?”
+“Is CPU usage above 80%?”						“Who modified the EC2 configuration?”
+
+
+CloudWatch = How is my system performing?
+CloudTrail = What action happened in my AWS account, and who performed it?
+
+CloudWatch metric
+A metric is a measurement of a resource or application over time.
+
+namespace
+A namespace is a container that groups related CloudWatch metrics.
+
+dimension
+A dimension identifies which resource or category a metric relates to.
+
+Namespace: Which group of metrics?
+Metric: What is being measured?
+Dimension: Which resource or category?
+
+CloudWatch Logs
+CloudWatch Logs helps you collect, store, search, and analyze log messages from AWS resources, operating systems, and applications.
+
+Log group
+A container for logs from a particular application, service, or purpose.
+
+Log stream
+A sequence of log events from a particular source, such as an EC2 instance or application process.
+
+Log event
+An individual timestamped log entry.
+
+Retention: Log groups have retention settings. If you don't configure a retention period, logs are retained indefinitely by default.
+Cost and security: Ingestion and storage can incur charges. Avoid unnecessarily collecting passwords, tokens, or other sensitive data.
+
+Amazon SNS
+Amazon Simple Notification Service (SNS) is a messaging service that distributes notifications to subscribed recipients or endpoints.
+
+Topic: A named channel for notifications.
+Publisher: The service or application that sends a message. In this example, a CloudWatch Alarm publishes to an SNS topic.
+Subscriber: The recipient or endpoint that receives messages, such as an email address or an AWS service integration.
+Subscription confirmation: For email subscriptions, the recipient generally must confirm the subscription before receiving notifications.
+
+
+AWS CloudTrail
+AWS CloudTrail records activity in your AWS account, including many actions performed through the AWS Management Console, AWS CLI, SDKs, and AWS services.
+
+
+Management events
+Record control-plane operations involving AWS resources and account configuration.
+
+Data events
+Record supported operations performed on or within data-plane resources.
+
+
+Event history: Provides a searchable history of recent management events. By default, CloudTrail Event history provides the previous 90 days of management events for a Region.
+Trail: A configuration that records selected events and delivers them to a destination, commonly an S3 bucket. It can also be configured to deliver events to CloudWatch Logs.
+Organization trail: Can collect supported activity across an AWS Organization, subject to its configuration and permissions.
+
+event selectors
+Event selectors define which categories of events a trail records. They help you choose the level of auditing you need.
+
