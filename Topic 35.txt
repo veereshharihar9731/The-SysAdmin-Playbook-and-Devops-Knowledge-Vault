@@ -1,0 +1,79 @@
+DOCKER
+
+Docker is a platform that packages an application and its required dependencies so that it can run consistently across different environments.
+
+1. Container
+A running, isolated environment for an application.
+
+2. Image
+The packaged template used to create containers.
+
+3. Docker Engine
+The software that builds and runs containers.
+
+4. Registry
+A place to store and download images.
+
+5. Dockerfile
+A text file containing instructions to build your own image.
+
+docker image
+An image is a reusable template. It is not a running application by itself.
+
+nginx:alpine
+
+- nginx is the web server software.
+- alpine identifies a lightweight Linux-based variant of the image.
+
+Docker downloaded the image
+& $docker run --name nginx-lab -d -p 8080:80 nginx:alpine
+
+To see the images
+& $docker images
+
+docker container
+A container is an isolated running instance created from an image.
+
+
+Lists running containers.
+& $docker ps
+
+Lists running and stopped containers.
+& $docker ps -a
+
+Stops a container without deleting it.
+& $docker stop nginx-lab
+
+Starts that existing container again.
+& $docker start nginx-lab
+
+Dockerfile
+A Dockerfile is a plain text file containing instructions to build an image.
+
+FROM nginx:alpine
+COPY index.html /usr/share/nginx/html/index.html
+
+FROM nginx:alpine
+
+
+Meaning: start with the existing Nginx image as the foundation for your new image.
+
+Instruction 2:
+COPY index.html /usr/share/nginx/html/index.html
+
+
+Meaning: take your local index.html file and copy it into the image at Nginx's default website location.
+
+Once the image is built, it contains both the Nginx software and your HTML file.
+
+Build an image:
+& $docker build -t my-nginx:v1 "$HOME\docker-lab\custom-nginx"
+
+Run a container from the image:
+& $docker run --name custom-website -d -p 8082:80 my-nginx:v1
+
+
+
+Bind mount: Change the HTML file on Windows, and the container can serve the updated file immediately.
+
+Custom image: Changing the original Windows HTML file does not change the copy already stored in the image. You generally rebuild the image and recreate the container to deploy the updated content.
