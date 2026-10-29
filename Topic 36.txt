@@ -1,0 +1,328 @@
+Docker volume
+Docker manages the storage location. It's useful for persistent application data, such as MySQL database files.
+
+Bind mount
+You select a specific folder or file on your Windows machine and connect it to a path inside the container. It's useful for editing website files without rebuilding the image.
+
+Volume: Docker stores the data for you.
+Bind mount: Your Windows index.html is connected directly to the container's website directory.
+
+
+Create a project folder
+New-Item -ItemType Directory -Force "$HOME\docker-lab\bind-mount"
+
+Create an HTML file
+Set-Content "$HOME\docker-lab\bind-mount\index.html" "<h1>Hello from Windows Bind Mount!</h1>"
+
+Verify the file:
+Get-Content "$HOME\docker-lab\bind-mount\index.html"
+
+Expected:
+<h1>Hello from Windows Bind Mount!</h1>
+
+Step 3. Run Nginx with a bind mount
+docker run --name bind-mount-lab -d -p 8083:80 -v "${HOME}\docker-lab\bind-mount:/usr/share/nginx/html:ro" nginx:alpine
+
+Step 4. Test the website
+curl.exe http://localhost:8083
+
+Expected:
+<h1>Hello from Windows Bind Mount!</h1>
+
+
+You can also open http://localhost:8083 in your browser.
+Step 5. Update the Windows file
+Set-Content "$HOME\docker-lab\bind-mount\index.html" "<h1>Updated Website Without Rebuilding!</h1>"
+
+
+Test again:
+curl.exe http://localhost:8083
+
+
+Expected:
+<h1>Updated Website Without Rebuilding!</h1>
+
+Step 6. Inspect the bind mount
+docker inspect bind-mount-lab
+
+To display only the mount information:
+docker inspect --format '{{json .Mounts}}' bind-mount-lab
+
+Step 7. Stop, start, and remove the container
+docker stop bind-mount-lab
+docker start bind-mount-lab
+curl.exe http://localhost:8083
+
+Remove it when you finish:
+docker stop bind-mount-lab
+docker rm bind-mount-lab
+
+Step 1. Create a named volume
+docker volume create docker-data-lab
+
+Expected:
+docker-data-lab
+
+Step 2. List the volumes
+docker volume ls
+
+Expected to include:
+DRIVER    VOLUME NAME
+local     docker-data-lab
+
+Step 3. Inspect the volume
+docker volume inspect docker-data-lab
+
+Step 4. Create a container using the volume
+docker run -it --name volume-test -v docker-data-lab:/data alpine sh
+
+
+You're now inside the Alpine Linux container. Your prompt should look similar to:
+/ #
+
+
+Step 5. Write a file into the volume
+Run these commands inside the Alpine container:
+echo "Docker volume data persists!" > /data/test.txt
+
+
+Read the file:
+cat /data/test.txt
+
+
+Expected:
+Docker volume data persists!
+
+
+Confirm the file exists:
+ls -l /data
+
+
+Exit the container:
+exit
+
+
+Step 6. Check the container
+Back in PowerShell:
+docker ps -a
+
+
+The volume-test container should show as exited.
+Step 7. Remove the original container
+docker rm volume-test
+
+
+This removes the container, not the named volume.
+Step 8. Read the data from a new container
+docker run --rm -v docker-data-lab:/data alpine cat /data/test.txt
+
+
+Expected:
+Docker volume data persists!
+
+
+This is the key test: the original container has been deleted, but the file still exists because the named volume persists independently.
+Step 9. Verify the volume still exists
+docker volume ls
+
+# List containers
+docker ps -a
+
+# List images
+docker images
+
+# List volumes
+docker volume ls
+
+# List networks
+docker network ls
+
+# Inspect a container's mounts
+docker inspect --format '{{json .Mounts}}' bind-mount-lab
+
+# View container logs
+docker logs bind-mount-lab
+
+
+Default bridge network
+Custom bridge network
+DNS-based container-to-container communication
+Communicating between containers without publishing their ports to Windows
+
+Check existing Docker networks
+docker network ls
+
+Shows all Docker networks.
+docker network inspect bridge
+
+Lists running containers and their published ports.
+docker ps -a
+
+2. Create a custom bridge network
+docker network create middleware-net
+
+Verify the network:
+docker network ls
+
+Inspect its details:
+docker network inspect middleware-net
+
+3. Create the frontend container
+docker run -d --name nginx-frontend --network middleware-net -p 8087:80 nginx:alpine
+
+Check it:
+docker ps --filter "name=nginx-frontend"
+
+Test it from Windows:
+curl.exe http://localhost:8087
+
+4. Create the backend container
+docker run -d --name app-backend --network middleware-net nginx:alpine
+
+Check it:
+docker ps --filter "name=app-backend"
+
+You should see the container running without a published host port.
+5. Check that both containers are connected
+docker network inspect middleware-net
+
+You can also inspect each container individually:
+docker inspect nginx-frontend
+
+docker inspect app-backend
+
+6. Test communication between the containers
+Run:
+docker exec nginx-frontend wget -qO- http://app-backend
+
+
+Expected result: the HTML for the Nginx welcome page.
+
+
+To test using the internal IP directly, you can run:
+docker exec nginx-frontend wget -qO- http://172.18.0.3
+
+
+The IP can change if containers are recreated, so using the container name is preferable.
+7. Check whether the backend port is published
+docker port app-backend
+
+Expected result: no output, because we did not publish a port.
+
+Compare with the frontend:
+docker port nginx-frontend
+
+8. Connect an existing container to the network
+If a container was created without middleware-net, you can connect it later:
+docker network connect middleware-net CONTAINER_NAME
+
+For example, to connect your existing custom-website container:
+docker network connect middleware-net custom-website
+
+Verify:
+docker network inspect middleware-net
+
+To disconnect it later:
+docker network disconnect middleware-net custom-website
+
+Only do this if you actually want that existing container on the custom network.
+9. Stop and start the lab containers
+Stop both:
+docker stop nginx-frontend app-backend
+
+Start them again:
+docker start nginx-frontend app-backend
+
+Check status:
+docker ps
+
+
+How can two Docker containers communicate without exposing the backend port to the host?
+
+Answer: Place both containers on the same user-defined bridge network. Docker provides DNS-based name resolution, allowing the frontend to access the backend using its container name and internal listening port. Publish ports only for services that need access from outside the Docker network.
+
+
+Docker Compose
+
+create docker compose
+docker compose version
+
+Create a Docker Compose project folder
+New-Item -ItemType Directory -Force "$HOME\docker-lab\compose-lab"
+Set-Location "$HOME\docker-lab\compose-lab"
+
+Step 1 — Verify Docker and Compose
+Run in Windows PowerShell:
+docker --version
+docker compose version
+
+
+Step 2 — Create the project folder
+New-Item -ItemType Directory -Force "$HOME\docker-lab\compose-lab"
+Set-Location "$HOME\docker-lab\compose-lab"
+Get-Location
+
+Step 3 — Create compose.yaml
+Run this entire block in PowerShell:
+@'
+services:
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "8087:80"
+    depends_on:
+      - backend
+
+  backend:
+    image: nginx:alpine
+'@ | Set-Content -Encoding utf8 compose.yaml
+
+
+Check the file:
+Get-Content .\compose.yaml
+
+
+The backend has no ports entry, so its port is not published to Windows.
+Step 4 — Validate the configuration
+docker compose config
+
+
+Expected: the normalized configuration lists both services and the automatically configured default network.
+Step 5 — Start the application
+docker compose up -d
+
+
+This creates the network, creates both containers, and starts them in the background.
+Step 6 — Check service status
+docker compose ps
+
+
+Step 7 — Test the frontend from Windows
+curl.exe http://localhost:8087
+
+http://localhost:8087
+Step 8 — Test frontend-to-backend communication
+docker compose exec frontend wget -qO- http://backend
+
+
+Expected: the backend's Nginx welcome page HTML.
+
+Step 9 — Inspect the Compose network
+docker network ls
+
+Find compose-lab_default, then inspect it:
+docker network inspect compose-lab_default
+
+You should find both Compose containers connected to the network.
+Step 10 — View service logs
+docker compose logs
+
+Start everything again:
+docker compose up -d
+
+Check the status:
+docker compose ps
+
+Step 12 — Remove the lab when finished
+When you no longer need the lab, run this from the project folder:
+docker compose down
