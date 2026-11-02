@@ -1,0 +1,89 @@
+1	Jenkins introduction and installation using Docker
+2	Jenkins dashboard and Freestyle Jobs
+3	Git and GitHub integration
+4	Jenkins agents and nodes
+5	Pipeline and Jenkinsfile
+6	Docker integration with Jenkins
+7	Build automation and deployment
+8	Notifications and troubleshooting
+9	Complete CI/CD project
+
+
+Jenkins
+Jenkins is an open-source automation server used to automate software building, testing and deployment.
+
+1. Developer pushes code to GitHub.
+2. Jenkins detects the changes.
+3. Jenkins downloads the code.
+4. Jenkins builds the application.
+5. Jenkins runs tests.
+6. Jenkins deploys the application.
+This process is called CI/CD (Continuous Integration and Continuous Delivery/Deployment).
+
+
+docker --version
+Docker version 29.9.2, build a82e528
+
+docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+New-Item -ItemType Directory -Force "$HOME\jenkins-lab"
+
+cd "$HOME\jenkins-lab"
+Get-Location
+
+docker volume create jenkins-data
+
+Why LTS? Long-Term Support releases are intended for stability and receive regular maintenance updates.
+docker pull jenkins/jenkins:lts-jdk21
+
+docker run -d `
+  --name jenkins-server `
+  --restart unless-stopped `
+  -p 8080:8080 `
+  -p 50000:50000 `
+  -v jenkins-data:/var/jenkins_home `
+  jenkins/jenkins:lts-jdk21
+  
+To check logs 
+docker logs -f jenkins-server
+
+To see password
+docker exec jenkins-server cat /var/jenkins_home/secrets/initialAdminPassword 
+
+Option					Purpose
+New Item				Create a Jenkins job
+Build History			View previous builds
+Manage Jenkins			Configure Jenkins, plugins, security and tools
+Build Queue	Shows 		jobs waiting to execute
+Build Executor Status	Shows available build execution slots
+Set up an agent			Configure another machine to execute jobs
+
+What is a Jenkins job?
+A Jenkins job is a configured task that Jenkins executes, such as building code, running tests or deploying an application.
+
+docker volume inspect jenkins-data
+
+What is a Freestyle Job?
+A Freestyle Job is a basic Jenkins project used to automate tasks such as executing shell commands, building applications and running scripts.
+
+What is a Jenkins workspace?
+A workspace is the directory where Jenkins stores and processes files for a particular job.
+
+What does Finished: SUCCESS mean?
+It means the build completed without a command returning a failure status.
+
+What is the difference between Jenkins and Docker?
+- Jenkins automates software building, testing and deployment.
+- Docker packages and runs applications in containers.
+
+
+Jenkins Build						Jenkins Pipeline
+An execution of a Jenkins job.		An automated workflow containing multiple stages.
+Can execute a simple task.			Can coordinate complex CI/CD processes.
+Example: Run a shell script.		Example: Build → Test → Deploy.
+
+
+login to jenkins http://localhost:8080/
+
+then create job freestyle job and name it then add build steps type down the commands and save it next click on build now and you can see the build steps in console output
