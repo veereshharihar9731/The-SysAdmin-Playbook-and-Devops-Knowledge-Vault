@@ -1,0 +1,94 @@
+Name tag
+middleware-vpc
+
+IPv4 CIDR
+10.20.0.0/16
+
+Subnet 1 of 4
+Subnet name
+
+public-subnet-1
+
+Asia Pacific (Sydney) / apse2-az1 (ap-southeast-2a)
+
+10.20.0.0/16
+
+IPv4 subnet CIDR block
+10.20.1.0/24
+256 IPs
+
+Subnet 2 of 4
+Subnet name
+public-subnet-2
+
+Asia Pacific (Sydney) / apse2-az3 (ap-southeast-2b)
+
+10.20.0.0/16
+IPv4 subnet CIDR block
+10.20.2.0/24
+256 IPs
+
+Subnet 3 of 4
+Subnet name
+app-subnet-1
+
+Asia Pacific (Sydney) / apse2-az1 (ap-southeast-2a)
+
+10.20.0.0/16
+IPv4 subnet CIDR block
+10.20.11.0/24
+256 IPs
+
+Subnet 4 of 4
+
+Subnet name
+app-subnet-2
+
+Asia Pacific (Sydney) / apse2-az3 (ap-southeast-2b)
+
+10.20.0.0/16
+
+IPv4 subnet CIDR block
+10.20.12.0/24
+256 IPs
+
+Details Info
+Internet gateway ID
+igw-0462832ad46c224f6
+State
+Attached
+VPC ID
+vpc-0755f29e6c391ff84 | middleware-vpc
+Owner
+865609249582
+
+
+–
+sg-098af27dd584186c9
+Nginx-SG
+vpc-0755f29e6c391ff84 
+Attached to Nginx EC2
+865609249582
+1 Permission entry
+1 Permission entry
+
+–
+sg-0f86eaee78954b8c0
+Backend-SG
+vpc-0755f29e6c391ff84 
+Attached to four backend EC2 instances
+865609249582
+1 Permission entry
+1 Permission entry
+
+–
+sg-035db3ec3e94c448e
+ALB-SG
+vpc-0755f29e6c391ff84 
+Attached to Application Load Balancer
+865609249582
+1 Permission entry
+1 Permission entry
+
+
+
